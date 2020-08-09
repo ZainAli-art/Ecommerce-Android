@@ -6,21 +6,22 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
-public class MyInstance {
-    private static MyInstance mInstance;
+public class MySingleton {
+    private static MySingleton mInstance;
     private static Context ctx;
+    public static final String HOST_URL = "http://192.168.8.101/";
 
     private RequestQueue requestQueue;
 
-    private MyInstance(Context context) {
+    private MySingleton(Context context) {
         // private constructor (Singleton Pattern)
         ctx = context;
         requestQueue = Volley.newRequestQueue(context);
     }
 
-    public static synchronized MyInstance getInstance(Context context) {
+    public static synchronized MySingleton getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new MyInstance(context);
+            mInstance = new MySingleton(context);
         }
         return mInstance;
     }

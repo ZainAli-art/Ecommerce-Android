@@ -7,7 +7,9 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -26,13 +28,20 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.android.ecommerce.MySingleton.HOST_URL;
+
 public class HomeFragment extends Fragment {
     public static final int REQUEST_INTERNET = 1;
-    public static final String HOST_URL = "http://192.168.8.101/";
+    public static final String SELECTED_CAT_ID = "com.example.android.ecommerce.HomeFragment.cat_id";
+
     public static final String CAT_JSON_URL = HOST_URL + "json/categories-json.php";
 
     private RecyclerView categoryRecyclerView;
-    private List<Category> categories;
+    private CategoryRecyclerViewAdapter adapter;
+
+    public interface ListItemListener {
+        void onClickListItem(int pos);
+    }
 
     public HomeFragment() {
         // Required empty public constructor
@@ -50,6 +59,8 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         categoryRecyclerView = view.findViewById(R.id.categoryRecyclerView);
+        adapter = new CategoryRecyclerViewAdapter(new ArrayList<Category>());
+        categoryRecyclerView.setAdapter(adapter);
         requestPermissions(new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET);
     }
 
@@ -71,7 +82,7 @@ public class HomeFragment extends Fragment {
         JsonArrayRequest request = new JsonArrayRequest(
                 CAT_JSON_URL,
                 response -> {
-                    categories = new ArrayList<>();
+                    List<Category> categories = new ArrayList<>();
                     try {
                         for (int i = 0; i < response.length(); i++) {
                             JSONObject jsonObject = response.getJSONObject(i);
@@ -85,29 +96,34 @@ public class HomeFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    categoryRecyclerView.setAdapter(new CategoryRecyclerViewAdapter(categories));
+                    adapter.setCatList(categories);
                 },
                 error -> {
                     Toast.makeText(requireContext(), "Json Response Error", Toast.LENGTH_SHORT).show();
                 }
         );
 
-        MyInstance.getInstance(requireContext()).enqueueRequest(request);
+        MySingleton.getInstance(requireContext()).enqueueRequest(request);
     }
 
-    public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRecyclerViewAdapter.CViewHolder> {
+    public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRecyclerViewAdapter.CViewHolder> implements ListItemListener {
         private List<Category> catList;
 
         public CategoryRecyclerViewAdapter(List<Category> catList) {
             this.catList = catList;
         }
 
+        public void setCatList(List<Category> catList) {
+            this.catList = catList;
+            notifyDataSetChanged();
+        }
+
         @NonNull
         @Override
         public CViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View listItem = LayoutInflater.from(parent.getContext())
+            View itemView = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.category_list_item, parent, false);
-            return new CViewHolder(listItem);
+            return new CViewHolder(this, itemView);
         }
 
         @Override
@@ -119,17 +135,33 @@ public class HomeFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return catList.size();
+            if (catList != null)
+                return catList.size();
+            return 0;
+        }
+
+        @Override
+        public void onClickListItem(int pos) {
+            if (catList != null) {
+                NavController navController = NavHostFragment.findNavController(HomeFragment.this);
+
+                String catId = String.valueOf(catList.get(pos).getId());
+                Bundle args = new Bundle();
+                args.putString(SELECTED_CAT_ID, catId);
+
+                navController.navigate(R.id.action_homeFragment_to_productListFragment, args);
+            }
         }
 
         public class CViewHolder extends RecyclerView.ViewHolder {
             private ImageView catImage;
             private TextView catText;
 
-            public CViewHolder(@NonNull View itemView) {
+            public CViewHolder(ListItemListener listItemListener, @NonNull View itemView) {
                 super(itemView);
                 catImage = itemView.findViewById(R.id.catImage);
                 catText = itemView.findViewById(R.id.catText);
+                itemView.setOnClickListener((view) -> listItemListener.onClickListItem(getAdapterPosition()));
             }
 
             public void setImage(String imgUrl) {
