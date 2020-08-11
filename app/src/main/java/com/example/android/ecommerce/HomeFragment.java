@@ -34,7 +34,7 @@ public class HomeFragment extends Fragment {
     public static final int REQUEST_INTERNET = 1;
     public static final String SELECTED_CAT_ID = "com.example.android.ecommerce.HomeFragment.cat_id";
 
-    public static final String CAT_JSON_URL = HOST_URL + "json/categories-json.php";
+    public static final String CAT_JSON_URL = HOST_URL + "scripts/all-categories-json.php";
 
     private RecyclerView categoryRecyclerView;
     private CategoryRecyclerViewAdapter adapter;

@@ -35,7 +35,7 @@ import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class ProductListFragment extends Fragment {
     private static final String TAG = "ProductListFragment";
-    public static final String PRODUCTS_URL = HOST_URL + "json/products-by-cat_id.php";
+    public static final String PRODUCTS_URL = HOST_URL + "scripts/products-by-cat_id-json.php";
 
     private RecyclerView productListRecyclerView;
     private ProductListRecyclerViewAdapter adapter;
