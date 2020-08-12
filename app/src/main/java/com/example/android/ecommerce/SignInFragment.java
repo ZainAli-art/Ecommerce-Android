@@ -2,57 +2,45 @@ package com.example.android.ecommerce;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SignInFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class SignInFragment extends Fragment {
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+import org.json.JSONException;
+import org.json.JSONObject;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.example.android.ecommerce.MySingleton.HOST_URL;
+
+public class SignInFragment extends Fragment implements View.OnClickListener {
+    private static final String TAG = "SignInFragment";
+    public static final String INSERT_CUSTOMER_URL = HOST_URL + "scripts/insert-customer.php";
+
+    private EditText email;
+    private EditText password;
+    private Button loginBtn;
+
+    private NavController navController;
 
     public SignInFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SignInFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SignInFragment newInstance(String param1, String param2) {
-        SignInFragment fragment = new SignInFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -60,5 +48,67 @@ public class SignInFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_sign_in, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        email = view.findViewById(R.id.email);
+        password = view.findViewById(R.id.password);
+        loginBtn = view.findViewById(R.id.loginBtn);
+        loginBtn.setOnClickListener(this);
+
+        navController = Navigation.findNavController(view);
+    }
+
+    public void login(String email, String password) {
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                INSERT_CUSTOMER_URL,
+                response -> {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        int uid = jsonObject.getInt("uid");
+                        moveToHomeFragment(uid);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                    Toast.makeText(getContext(), "URL response error", Toast.LENGTH_SHORT).show();
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Log.d(TAG, "getParams: called");
+                Map<String, String> params = new HashMap<>();
+                params.put("email", email);
+                params.put("pwd", password);
+                return params;
+            }
+        };
+
+        MySingleton.getInstance(getContext()).enqueueRequest(request);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.loginBtn:
+                login(email.getText().toString(), password.getText().toString());
+                break;
+            default:
+                Toast.makeText(getContext(), "No functionality assigned yet.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void moveToHomeFragment(int uid) {
+        if (uid == -1) {
+            Toast.makeText(getContext(), "Invalid Credentials", Toast.LENGTH_SHORT).show();
+        } else {
+            Bundle args = new Bundle();
+            args.putInt("uid", uid);
+            navController.navigate(R.id.action_signInFragment_to_homeFragment, args);
+        }
     }
 }
