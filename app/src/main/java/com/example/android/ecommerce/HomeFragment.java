@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.bumptech.glide.Glide;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,14 +31,25 @@ import java.util.List;
 
 import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements View.OnClickListener {
     public static final int REQUEST_INTERNET = 1;
     public static final String SELECTED_CAT_ID = "com.example.android.ecommerce.HomeFragment.cat_id";
 
     public static final String CAT_JSON_URL = HOST_URL + "scripts/all-categories-json.php";
 
     private RecyclerView categoryRecyclerView;
+    private FloatingActionButton addProductFab;
     private CategoryRecyclerViewAdapter adapter;
+    private NavController navController;
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.addProductFab:
+                navController.navigate(R.id.action_homeFragment_to_addProductFragment);
+                break;
+        }
+    }
 
     public interface ListItemListener {
         void onClickListItem(int pos);
@@ -61,7 +73,12 @@ public class HomeFragment extends Fragment {
         categoryRecyclerView = view.findViewById(R.id.categoryRecyclerView);
         adapter = new CategoryRecyclerViewAdapter(new ArrayList<Category>());
         categoryRecyclerView.setAdapter(adapter);
+        addProductFab = view.findViewById(R.id.addProductFab);
+        navController = Navigation.findNavController(view);
+        addProductFab.setOnClickListener(this);
+
         requestPermissions(new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET);
+
     }
 
     @Override
