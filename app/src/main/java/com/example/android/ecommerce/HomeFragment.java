@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
@@ -19,38 +20,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.model.Category;
+import com.example.android.ecommerce.viewmodel.CustomerViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class HomeFragment extends Fragment implements View.OnClickListener {
     public static final int REQUEST_INTERNET = 1;
     public static final String SELECTED_CAT_ID = "com.example.android.ecommerce.HomeFragment.cat_id";
 
-    public static final String CAT_JSON_URL = HOST_URL + "scripts/all-categories-json.php";
-
     private RecyclerView categoryRecyclerView;
     private FloatingActionButton addProductFab;
     private CategoryRecyclerViewAdapter adapter;
     private NavController navController;
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.addProductFab:
-                navController.navigate(R.id.action_homeFragment_to_addProductFragment);
-                break;
-        }
-    }
+    private CustomerViewModel viewModel;
 
     public interface ListItemListener {
         void onClickListItem(int pos);
@@ -77,9 +63,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         addProductFab = view.findViewById(R.id.addProductFab);
         navController = Navigation.findNavController(view);
         addProductFab.setOnClickListener(this);
+        viewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(CustomerViewModel.class);
+
+        viewModel.getCategoryList().observe(requireActivity(), categories -> {
+            adapter.setCatList(categories);
+        });
 
         requestPermissions(new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET);
-
     }
 
     @Override
@@ -88,40 +81,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         if (requestCode == REQUEST_INTERNET) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                loadCategories();
+                viewModel.refreshCategories();
             } else {
                 Toast.makeText(requireContext(), "Internet Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    public void loadCategories() {
-        // TODO: parse categories json array using volley to Categories list
-        JsonArrayRequest request = new JsonArrayRequest(
-                CAT_JSON_URL,
-                response -> {
-                    List<Category> categories = new ArrayList<>();
-                    try {
-                        for (int i = 0; i < response.length(); i++) {
-                            JSONObject jsonObject = response.getJSONObject(i);
-                            int catId = jsonObject.getInt("cat_id");
-                            String catName = jsonObject.getString("cat_name");
-                            String imgUrl = HOST_URL + jsonObject.getString("img_dir");
-
-                            categories.add(new Category(catId, catName, imgUrl));
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    adapter.setCatList(categories);
-                },
-                error -> {
-                    Toast.makeText(requireContext(), "Json Response Error", Toast.LENGTH_SHORT).show();
-                }
-        );
-
-        MySingleton.getInstance(requireContext()).enqueueRequest(request);
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.addProductFab:
+                navController.navigate(R.id.action_homeFragment_to_addProductFragment);
+                break;
+        }
     }
 
     public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRecyclerViewAdapter.CViewHolder> implements ListItemListener {
@@ -132,7 +105,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
 
         public void setCatList(List<Category> catList) {
-            this.catList = catList;
+            if (catList == null) {
+                this.catList = new ArrayList<>();
+            } else {
+                this.catList = catList;
+            }
             notifyDataSetChanged();
         }
 
