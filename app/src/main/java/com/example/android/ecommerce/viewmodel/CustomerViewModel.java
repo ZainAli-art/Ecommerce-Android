@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
@@ -29,9 +30,11 @@ import static com.example.android.ecommerce.MySingleton.HOST_URL;
 public class CustomerViewModel extends AndroidViewModel {
     public static final String INSERT_CUSTOMER_URL = HOST_URL + "scripts/insert-customer.php";
     public static final String CAT_JSON_URL = HOST_URL + "scripts/all-categories-json.php";
+    public static final String UPLOAD_PRODUCT_URL = HOST_URL + "scripts/upload-product.php";
 
     private MutableLiveData<Customer> mCustomer;
     private MutableLiveData<List<Category>> catList;
+    private Map<String, Integer> catMap;
     private Context mContext;
 
     public CustomerViewModel(@NonNull Application application) {
@@ -39,6 +42,7 @@ public class CustomerViewModel extends AndroidViewModel {
         mContext = application.getApplicationContext();
         mCustomer = new MutableLiveData<>();
         catList = new MutableLiveData<>();
+        catMap = new HashMap<>();
     }
 
     public LiveData<Customer> getCustomer() {
@@ -51,11 +55,19 @@ public class CustomerViewModel extends AndroidViewModel {
         return catList;
     }
 
+    public int getCatIdByName(String categoryName) {
+        Integer id = catMap.get(categoryName);
+        if (id == null) return -1;
+        return id;
+    }
+
     public void setCustomer(Customer customer) {
         mCustomer.setValue(customer);
     }
 
     public void setCatList(List<Category> categories) {
+        for (Category c : categories)
+            catMap.put(c.getName(), c.getId());
         catList.setValue(categories);
     }
 
@@ -108,13 +120,36 @@ public class CustomerViewModel extends AndroidViewModel {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-//                    adapter.setCatList(categories);
                     setCatList(categories);
                 },
                 error -> {
                     Toast.makeText(mContext, "Json Response Error", Toast.LENGTH_SHORT).show();
                 }
         );
+
+        MySingleton.getInstance(mContext).enqueueRequest(request);
+    }
+
+    public void uploadProduct(String pName, String catId, String img) {
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                UPLOAD_PRODUCT_URL,
+                response -> {
+                    Toast.makeText(mContext, "Product Uploaded Successfully.", Toast.LENGTH_SHORT).show();
+                },
+                error -> {
+                    Toast.makeText(mContext, "Response Error.", Toast.LENGTH_SHORT).show();
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("image", img);
+                params.put("pname", pName);
+                params.put("cat_id", catId);
+                return params;
+            }
+        };
 
         MySingleton.getInstance(mContext).enqueueRequest(request);
     }
