@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.bumptech.glide.Glide;
+import com.example.android.ecommerce.model.Category;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONException;

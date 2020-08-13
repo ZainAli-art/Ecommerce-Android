@@ -1,4 +1,4 @@
-package com.example.android.ecommerce;
+package com.example.android.ecommerce.utils;
 
 import android.graphics.Bitmap;
 import android.util.Base64;

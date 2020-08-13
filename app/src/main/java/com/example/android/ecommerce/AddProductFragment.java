@@ -29,9 +29,7 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.android.ecommerce.utils.ByteUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -141,11 +139,11 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
                 Request.Method.POST,
                 IMAGE_URL,
                 response -> {
-                    Log.d(TAG, "uploadProduct response: " + response);
-                    Log.d(TAG, "uploadProduct: response success");
+                    Toast.makeText(getContext(), "Product Uploaded Successfully.", Toast.LENGTH_SHORT).show();
+                    navController.popBackStack();
                 },
                 error -> {
-                    Log.d(TAG, "uploadProduct: failure");
+                    Toast.makeText(getContext(), "Response Error.", Toast.LENGTH_SHORT).show();
                 }
         ) {
             @Override
@@ -161,6 +159,5 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
         };
 
         MySingleton.getInstance(getContext()).enqueueRequest(request);
-        navController.popBackStack();
     }
 }
