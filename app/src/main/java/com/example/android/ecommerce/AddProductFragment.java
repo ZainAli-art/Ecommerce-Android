@@ -32,7 +32,9 @@ import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.model.Category;
 import com.example.android.ecommerce.utils.ByteUtil;
+import com.example.android.ecommerce.viewmodel.CategoryViewModel;
 import com.example.android.ecommerce.viewmodel.CustomerViewModel;
+import com.example.android.ecommerce.viewmodel.ProductViewModel;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -49,7 +51,8 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
     private Button uploadProductBtn;
     private Spinner catSpinner;
     private NavController navController;
-    private CustomerViewModel viewModel;
+    private CategoryViewModel categoryViewModel;
+    private ProductViewModel productViewModel;
 
     private Bitmap bitmap;
     String[] catSpinnerItems;
@@ -73,12 +76,17 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
         productName = view.findViewById(R.id.productName);
         uploadProductBtn = view.findViewById(R.id.uploadProductBtn);
         uploadProductBtn.setOnClickListener(this);
-        viewModel = new ViewModelProvider(
+        categoryViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(CustomerViewModel.class);
+        ).get(CategoryViewModel.class);
+        productViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(ProductViewModel.class);
 
-        viewModel.getCategoryList().observe(requireActivity(), categories -> {
+
+        categoryViewModel.getCategories().observe(requireActivity(), categories -> {
             catSpinnerItems = new String[categories.size()];
             int index = 0;
             for (Category c : categories) catSpinnerItems[index++] = c.getName();
@@ -125,10 +133,10 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
                     Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
                 } else {
                     String img = ByteUtil.BitmapToString(bitmap);
-                    String catId = String.valueOf(viewModel.getCatIdByName(catSpinner.getSelectedItem().toString()));
+                    String catId = String.valueOf(categoryViewModel.getCatIdByName(catSpinner.getSelectedItem().toString()));
                     String pName = productName.getText().toString();
 
-                    viewModel.uploadProduct(pName, catId, img);
+                    productViewModel.uploadProduct(pName, catId, img);
                     navController.popBackStack();
                 }
                 break;

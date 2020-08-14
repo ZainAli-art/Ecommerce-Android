@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.model.Category;
-import com.example.android.ecommerce.viewmodel.CustomerViewModel;
+import com.example.android.ecommerce.viewmodel.CategoryViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private FloatingActionButton addProductFab;
     private CategoryRecyclerViewAdapter adapter;
     private NavController navController;
-    private CustomerViewModel viewModel;
+    private CategoryViewModel categoryViewModel;
 
     public interface ListItemListener {
         void onClickListItem(int pos);
@@ -63,12 +63,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         addProductFab = view.findViewById(R.id.addProductFab);
         navController = Navigation.findNavController(view);
         addProductFab.setOnClickListener(this);
-        viewModel = new ViewModelProvider(
+        categoryViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(CustomerViewModel.class);
+        ).get(CategoryViewModel.class);
 
-        viewModel.getCategoryList().observe(requireActivity(), categories -> {
+
+        categoryViewModel.getCategories().observe(requireActivity(), categories -> {
             adapter.setCatList(categories);
         });
 
@@ -81,7 +82,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         if (requestCode == REQUEST_INTERNET) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                viewModel.refreshCategories();
+                categoryViewModel.refreshCategories();
             } else {
                 Toast.makeText(requireContext(), "Internet Permission Denied", Toast.LENGTH_SHORT).show();
             }
