@@ -2,18 +2,25 @@ package com.example.android.ecommerce.viewmodel;
 
 import android.app.Application;
 import android.content.Context;
+import android.net.Uri;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.example.android.ecommerce.MySingleton;
 import com.example.android.ecommerce.model.Product;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +28,7 @@ import java.util.Map;
 import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class ProductViewModel extends AndroidViewModel {
+    public static final String FETCH_PRODUCTS_URL = HOST_URL + "scripts/products-by-cat_id-json.php";
     public static final String UPLOAD_PRODUCT_URL = HOST_URL + "scripts/upload-product.php";
 
     private Context mContext;
@@ -29,6 +37,47 @@ public class ProductViewModel extends AndroidViewModel {
     public ProductViewModel(@NonNull Application application) {
         super(application);
         mContext = application.getApplicationContext();
+        products = new MutableLiveData<>();
+    }
+
+    public LiveData<List<Product>> getProducts() {
+        return products;
+    }
+
+    public void setProductList(List<Product> productList) {
+        products.setValue(productList);
+    }
+
+    public void fetchProducts(String catId) {
+        Uri.Builder builder = Uri.parse(FETCH_PRODUCTS_URL).buildUpon();
+        builder.appendQueryParameter("cat_id", catId);
+
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                builder.toString(),
+                null,
+                response -> {
+                    try {
+                        List<Product> products = new ArrayList<>();
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject jsonObject = response.getJSONObject(i);
+                            int pid = jsonObject.getInt("pid");
+                            int cid = jsonObject.getInt("cat_id");
+                            String name = jsonObject.getString("pname");
+                            String imgUrl = HOST_URL + jsonObject.getString("img_dir");
+
+                            products.add(new Product(pid, cid, name, imgUrl));
+                        }
+                        setProductList(products);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                }
+        );
+
+        MySingleton.getInstance(mContext).enqueueRequest(request);
     }
 
     public void uploadProduct(String pName, String catId, String img) {

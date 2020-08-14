@@ -1,39 +1,30 @@
 package com.example.android.ecommerce;
 
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.Request;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.model.Product;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.android.ecommerce.viewmodel.ProductViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.android.ecommerce.MySingleton.HOST_URL;
-
 public class ProductListFragment extends Fragment {
-    private static final String TAG = "ProductListFragment";
-    public static final String PRODUCTS_URL = HOST_URL + "scripts/products-by-cat_id-json.php";
-
     private RecyclerView productListRecyclerView;
     private ProductListRecyclerViewAdapter adapter;
+    private ProductViewModel productViewModel;
 
     public ProductListFragment() {
         // Required empty public constructor
@@ -52,48 +43,19 @@ public class ProductListFragment extends Fragment {
         productListRecyclerView = view.findViewById(R.id.productListRecyclerView);
         adapter = new ProductListRecyclerViewAdapter(new ArrayList<Product>());
         productListRecyclerView.setAdapter(adapter);
-
+        productViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(ProductViewModel.class);
         Bundle args = getArguments();
         String catId = args.getString(HomeFragment.SELECTED_CAT_ID);
 
-        // we probably already have internet permission
-        // if we are on this page
-        fetchProducts(catId);
-    }
+        // observers
+        productViewModel.getProducts().observe(requireActivity(), products -> {
+            adapter.setProductList(products);
+        });
 
-    private void fetchProducts(String catId) {
-        Log.d(TAG, "fetchProducts: called");
-
-        Uri.Builder builder = Uri.parse(PRODUCTS_URL).buildUpon();
-        builder.appendQueryParameter("cat_id", catId);
-
-        JsonArrayRequest request = new JsonArrayRequest(
-                Request.Method.GET,
-                builder.toString(),
-                null,
-                response -> {
-                    try {
-                        List<Product> products = new ArrayList<>();
-                        for (int i = 0; i < response.length(); i++) {
-                            JSONObject jsonObject = response.getJSONObject(i);
-                            int pid = jsonObject.getInt("pid");
-                            int cid = jsonObject.getInt("cat_id");
-                            String name = jsonObject.getString("pname");
-                            String imgUrl = HOST_URL + jsonObject.getString("img_dir");
-
-                            products.add(new Product(pid, cid, name, imgUrl));
-                        }
-                        adapter.setProductList(products);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                error -> {
-                    Log.d(TAG, "fetchProducts error: " + error);
-                }
-        );
-
-        MySingleton.getInstance(requireContext()).enqueueRequest(request);
+        productViewModel.fetchProducts(catId);
     }
 
     public class ProductListRecyclerViewAdapter extends RecyclerView.Adapter<ProductListRecyclerViewAdapter.PViewHolder> {
