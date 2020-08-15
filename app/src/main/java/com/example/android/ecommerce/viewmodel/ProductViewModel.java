@@ -61,8 +61,8 @@ public class ProductViewModel extends AndroidViewModel {
                         List<Product> products = new ArrayList<>();
                         for (int i = 0; i < response.length(); i++) {
                             JSONObject jsonObject = response.getJSONObject(i);
-                            int pid = jsonObject.getInt("pid");
-                            int cid = jsonObject.getInt("cat_id");
+                            long pid = jsonObject.getLong("pid");
+                            long cid = jsonObject.getLong("cat_id");
                             String name = jsonObject.getString("pname");
                             String imgUrl = HOST_URL + jsonObject.getString("img_dir");
 

@@ -1,19 +1,19 @@
 package com.example.android.ecommerce.model;
 
 public class User {
-    private String uid;
+    private long uid;
     private String email;
     private String fullName;
     private String imgUrl;
 
-    public User(String uid, String email, String fullName, String imgUrl) {
+    public User(long uid, String email, String fullName, String imgUrl) {
         this.uid = uid;
         this.email = email;
         this.fullName = fullName;
         this.imgUrl = imgUrl;
     }
 
-    public String getUid() {
+    public long getUid() {
         return uid;
     }
 

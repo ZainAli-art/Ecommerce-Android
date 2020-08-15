@@ -28,7 +28,7 @@ public class CategoryViewModel extends AndroidViewModel {
 
     private Context mContext;
     private MutableLiveData<List<Category>> categories;
-    private Map<String, Integer> catMap;
+    private Map<String, Long> catMap;
 
     public CategoryViewModel(@NonNull Application application) {
         super(application);
@@ -44,8 +44,8 @@ public class CategoryViewModel extends AndroidViewModel {
         return categories;
     }
 
-    public int getCatIdByName(String categoryName) {
-        Integer id = catMap.get(categoryName);
+    public long getCatIdByName(String categoryName) {
+        Long id = catMap.get(categoryName);
         if (id == null) return -1;
         return id;
     }

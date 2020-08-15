@@ -1,23 +1,23 @@
 package com.example.android.ecommerce.model;
 
 public class Product {
-    private int id;
-    private int catId;
+    private long id;
+    private long catId;
     private String name;
     private String imgUrl;
 
-    public Product(int id, int catId, String name, String imgUrl) {
+    public Product(long id, long catId, String name, String imgUrl) {
         this.id = id;
         this.catId = catId;
         this.name = name;
         this.imgUrl = imgUrl;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public int getCatId() {
+    public long getCatId() {
         return catId;
     }
 
