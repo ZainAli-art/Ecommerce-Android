@@ -1,17 +1,17 @@
 package com.example.android.ecommerce.model;
 
 public class Customer {
-    private String id;
+    private int id;
     private String email;
     private String password;
 
-    public Customer(String id, String email, String password) {
+    public Customer(int id, String email, String password) {
         this.id = id;
         this.email = email;
         this.password = password;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 

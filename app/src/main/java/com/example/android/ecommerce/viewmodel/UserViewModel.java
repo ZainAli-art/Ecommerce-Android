@@ -54,7 +54,7 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     private User adaptUserFromGoogleSignInAccount(GoogleSignInAccount account) {
-        long uid = Long.parseLong(account.getId());
+        String uid = account.getId();
         String email = account.getEmail();
         String fullName = account.getDisplayName();
         Uri imgUrl = account.getPhotoUrl();

@@ -1,17 +1,17 @@
 package com.example.android.ecommerce.model;
 
 public class Category {
-    private String id;
+    private long id;
     private String name;
     private String imgUrl;
 
-    public Category(String id, String name, String imgUrl) {
+    public Category(long id, String name, String imgUrl) {
         this.id = id;
         this.name = name;
         this.imgUrl = imgUrl;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
     }
 
