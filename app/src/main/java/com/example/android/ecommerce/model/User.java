@@ -1,16 +1,18 @@
 package com.example.android.ecommerce.model;
 
+import android.net.Uri;
+
 public class User {
     private long uid;
     private String email;
     private String fullName;
-    private String imgUrl;
+    private Uri imgUri;
 
-    public User(long uid, String email, String fullName, String imgUrl) {
+    public User(long uid, String email, String fullName, Uri imgUri) {
         this.uid = uid;
         this.email = email;
         this.fullName = fullName;
-        this.imgUrl = imgUrl;
+        this.imgUri = imgUri;
     }
 
     public long getUid() {
@@ -25,7 +27,7 @@ public class User {
         return fullName;
     }
 
-    public String getImgUrl() {
-        return imgUrl;
+    public Uri getImgUri() {
+        return imgUri;
     }
 }
