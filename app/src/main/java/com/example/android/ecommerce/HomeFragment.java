@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.model.Category;
 import com.example.android.ecommerce.viewmodel.CategoryViewModel;
+import com.example.android.ecommerce.viewmodel.UserViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private CategoryRecyclerViewAdapter adapter;
     private NavController navController;
     private CategoryViewModel categoryViewModel;
+    private UserViewModel userViewModel;
 
     public interface ListItemListener {
         void onClickListItem(int pos);
@@ -67,8 +69,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(CategoryViewModel.class);
+        userViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(UserViewModel.class);
 
+        // check if any user was previously logged in
+        userViewModel.setUser(userViewModel.getLastSignedInUser());
 
+        userViewModel.getUser().observe(requireActivity(), user -> {
+            if (user == null) {
+                navController.navigate(R.id.signInFragment);
+            }
+        });
         categoryViewModel.getCategories().observe(requireActivity(), categories -> {
             adapter.setCatList(categories);
         });

@@ -1,5 +1,6 @@
 package com.example.android.ecommerce;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,21 +10,24 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.android.ecommerce.viewmodel.CustomerViewModel;
+import com.example.android.ecommerce.viewmodel.UserViewModel;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.tasks.Task;
 
 public class SignInFragment extends Fragment implements View.OnClickListener {
-    private EditText email;
-    private EditText password;
-    private Button loginBtn;
-    private CustomerViewModel viewModel;
+    private static final String TAG = "SignInFragment";
+    private static final int RC_SIGN_IN = 1;
+    private SignInButton googleSignInButton;
 
+    private UserViewModel userViewModel;
     private NavController navController;
 
     public SignInFragment() {
@@ -42,39 +46,43 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
         // initialize components
         navController = Navigation.findNavController(view);
-        email = view.findViewById(R.id.email);
-        password = view.findViewById(R.id.password);
-        loginBtn = view.findViewById(R.id.loginBtn);
-        loginBtn.setOnClickListener(this);
-        viewModel = new ViewModelProvider(
+        googleSignInButton = view.findViewById(R.id.googleSignInButton);
+        googleSignInButton.setOnClickListener(this);
+        userViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication()))
-                .get(CustomerViewModel.class);
+                .get(UserViewModel.class);
 
-        // add observers to live data from view model
-        viewModel.getCustomer().observe(getViewLifecycleOwner(), customer -> {
-            if (customer == null) {
-                Toast.makeText(getContext(), "Invalid Credentials", Toast.LENGTH_SHORT).show();
-            } else {
-                moveToHomeFragment(customer.getId());
+        userViewModel.getUser().observe(requireActivity(), user -> {
+            if (user != null) {
+                navController.popBackStack();
             }
         });
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            userViewModel.signInFromGoogleSignInTask(task);
+        }
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.loginBtn:
-                viewModel.login(email.getText().toString(), password.getText().toString());
+            case R.id.googleSignInButton:
+                googleSignIn();
                 break;
             default:
                 Toast.makeText(getContext(), "No functionality assigned yet.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void moveToHomeFragment(int uid) {
-        Bundle args = new Bundle();
-        args.putInt("uid", uid);
-        navController.navigate(R.id.action_signInFragment_to_homeFragment, args);
+    private void googleSignIn() {
+        Log.d(TAG, "googleSignIn: called");
+        Intent intent = userViewModel.getGoogleSignInClient().getSignInIntent();
+        startActivityForResult(intent, RC_SIGN_IN);
     }
 }

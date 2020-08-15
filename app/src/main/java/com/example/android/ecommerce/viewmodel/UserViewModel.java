@@ -49,8 +49,10 @@ public class UserViewModel extends AndroidViewModel {
         return mGoogleSignInClient;
     }
 
-    public GoogleSignInAccount getLastSignedInGoogleAccount() {
-        return GoogleSignIn.getLastSignedInAccount(mContext);
+    public User getLastSignedInUser() {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(mContext);
+        if (account == null) return null;
+        return adaptUserFromGoogleSignInAccount(account);
     }
 
     private User adaptUserFromGoogleSignInAccount(GoogleSignInAccount account) {
@@ -66,7 +68,7 @@ public class UserViewModel extends AndroidViewModel {
         mUser.setValue(user);
     }
 
-    private void signInFromGoogleSignInTask(Task<GoogleSignInAccount> completedTask) {
+    public void signInFromGoogleSignInTask(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             setUser(adaptUserFromGoogleSignInAccount(account));

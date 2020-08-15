@@ -9,7 +9,7 @@ import com.android.volley.toolbox.Volley;
 public class MySingleton {
     private static MySingleton mInstance;
     private static Context ctx;
-    public static final String HOST_URL = "http://192.168.8.100/";
+    public static final String HOST_URL = "http://192.168.8.101/";
 
     private RequestQueue requestQueue;
 
