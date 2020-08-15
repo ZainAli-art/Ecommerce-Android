@@ -6,13 +6,13 @@ public class User {
     private long uid;
     private String email;
     private String fullName;
-    private Uri imgUri;
+    private Uri imgUrl;
 
-    public User(long uid, String email, String fullName, Uri imgUri) {
+    public User(long uid, String email, String fullName, Uri imgUrl) {
         this.uid = uid;
         this.email = email;
         this.fullName = fullName;
-        this.imgUri = imgUri;
+        this.imgUrl = imgUrl;
     }
 
     public long getUid() {
@@ -27,7 +27,7 @@ public class User {
         return fullName;
     }
 
-    public Uri getImgUri() {
-        return imgUri;
+    public Uri getImgUrl() {
+        return imgUrl;
     }
 }
