@@ -107,8 +107,8 @@ public class UserViewModel extends AndroidViewModel {
                 params.put("uid", user.getUid());
                 params.put("email", user.getEmail());
                 params.put("fullname", user.getFullName());
-                String imgUrl = user.getImgUrl() == null ? "null" : user.getImgUrl().toString();
-                params.put("img_dir", imgUrl);
+                if (user.getImgUrl() != null)
+                    params.put("img_dir", user.getImgUrl().toString());
                 return params;
             }
         };
