@@ -1,5 +1,6 @@
 package com.example.android.ecommerce.viewmodel;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
@@ -20,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.HashMap;
@@ -86,6 +88,16 @@ public class UserViewModel extends AndroidViewModel {
         } catch (ApiException e) {
             setUser(null);
         }
+    }
+
+    public void signOutFromGoogleAccount(Activity activity) {
+        getGoogleSignInClient().signOut()
+                .addOnCompleteListener(activity, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        setUser(null);
+                    }
+                });
     }
     
     public void addUserToServer(User user) {
