@@ -98,7 +98,9 @@ public class UserViewModel extends AndroidViewModel {
                 response -> {
                     Log.d(TAG, "addUserToServer response: " + response);
                 },
-                error -> {}
+                error -> {
+                    Log.d(TAG, "addUserToServer error: " + error.getMessage());
+                }
         ) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {

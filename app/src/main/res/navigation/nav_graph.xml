@@ -32,4 +32,9 @@
         android:name="com.example.android.ecommerce.AddProductFragment"
         android:label="fragment_add_product"
         tools:layout="@layout/fragment_add_product" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.android.ecommerce.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
 </navigation>
