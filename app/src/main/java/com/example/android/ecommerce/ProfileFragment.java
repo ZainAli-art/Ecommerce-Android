@@ -77,7 +77,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.signOutBtn:
-                userViewModel.signOutFromGoogleAccount(requireActivity());
+                userViewModel.signOut(requireActivity());
                 break;
         }
     }

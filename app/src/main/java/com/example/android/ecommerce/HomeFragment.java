@@ -12,6 +12,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,7 +72,7 @@ public class HomeFragment extends Fragment {
         ).get(UserViewModel.class);
 
         // check if any user was previously logged in
-        userViewModel.setUser(userViewModel.getLastSignedInUser());
+        userViewModel.signInLastSignedInUser();
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             if (user == null && NavigationUtils.isValidInContext(navController, R.id.homeFragment)) {

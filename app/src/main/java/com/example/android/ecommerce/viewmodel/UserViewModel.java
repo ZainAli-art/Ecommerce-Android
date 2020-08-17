@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,14 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.example.android.ecommerce.MySingleton;
 import com.example.android.ecommerce.model.User;
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -23,6 +32,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,11 +46,20 @@ public class UserViewModel extends AndroidViewModel {
     private MutableLiveData<User> mUser;
     private GoogleSignInOptions gso;
     private GoogleSignInClient mGoogleSignInClient;
+    private CallbackManager facebookCallbackManager;
+    private AccessTokenTracker facebookAccessTokenTracker;
 
     public UserViewModel(@NonNull Application application) {
         super(application);
         mContext = application.getApplicationContext();
         mUser = new MutableLiveData<>();
+        facebookAccessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
+                if (currentAccessToken != null)
+                    loginFromFacebookAccessToken(currentAccessToken);
+            }
+        };
     }
 
     public LiveData<User> getUser() {
@@ -61,10 +82,26 @@ public class UserViewModel extends AndroidViewModel {
         return mGoogleSignInClient;
     }
 
-    public User getLastSignedInUser() {
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(mContext);
-        if (account == null) return null;
-        return adaptUserFromGoogleSignInAccount(account);
+    public void signInLastSignedInUser() {
+        GoogleSignInAccount googleSignInAccount;
+        AccessToken facebookAccessToken;
+
+        if ((facebookAccessToken = AccessToken.getCurrentAccessToken()) != null) {
+            Log.d(TAG, "signInLastSignedInUser: previous facebook account is not null");
+            loginFromFacebookAccessToken(facebookAccessToken);
+        } else if ((googleSignInAccount = GoogleSignIn.getLastSignedInAccount(mContext)) != null) {
+            Log.d(TAG, "signInLastSignedInUser: previous google account is not null");
+            setUser(adaptUserFromGoogleSignInAccount(googleSignInAccount));
+        } else {
+            setUser(null);
+        }
+    }
+
+    public CallbackManager getFacebookCallbackManager() {
+        if (facebookCallbackManager == null) {
+            facebookCallbackManager = CallbackManager.Factory.create();
+        }
+        return facebookCallbackManager;
     }
 
     private User adaptUserFromGoogleSignInAccount(GoogleSignInAccount account) {
@@ -74,6 +111,31 @@ public class UserViewModel extends AndroidViewModel {
         Uri imgUrl = account.getPhotoUrl();
 
         return new User(uid, email, fullName, imgUrl);
+    }
+
+    public void loginFromFacebookAccessToken(AccessToken accessToken) {
+        GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject object, GraphResponse response) {
+                try {
+                    String uid = object.getString("id");
+                    String name = object.getString("name");
+                    String email = object.getString("email");
+                    Uri imgUrl = Uri.parse("https://graph.facebook.com/" + uid + "/picture?type=normal");
+
+                    setUser(new User(uid, name, email, imgUrl));
+                    Log.d(TAG, "onCompleted: new user set via facebook");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "onCompleted error: " + e.getMessage());
+                }
+            }
+        });
+
+        Bundle params = new Bundle();
+        params.putString("fields", "name,email,id");
+        request.setParameters(params);
+        request.executeAsync();
     }
 
     public void setUser(User user) {
@@ -91,7 +153,16 @@ public class UserViewModel extends AndroidViewModel {
         }
     }
 
-    public void signOutFromGoogleAccount(Activity activity) {
+    public void signOut(Activity activity) {
+        signOutFromGoogleAccount(activity);
+        facebookLogout();
+    }
+
+    private void facebookLogout() {
+        LoginManager.getInstance().logOut();
+    }
+
+    private void signOutFromGoogleAccount(Activity activity) {
         getGoogleSignInClient().signOut()
                 .addOnCompleteListener(activity, new OnCompleteListener<Void>() {
                     @Override
@@ -104,20 +175,16 @@ public class UserViewModel extends AndroidViewModel {
     public void addUserToServer(User user) {
         if (user == null) return;
 
-        Log.d(TAG, "addUserToServer: processing...");
         StringRequest request = new StringRequest(
                 Request.Method.POST,
                 ADD_USER_URL,
                 response -> {
-                    Log.d(TAG, "addUserToServer response: " + response);
                 },
                 error -> {
-                    Log.d(TAG, "addUserToServer error: " + error.getMessage());
                 }
         ) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                Log.d(TAG, "getParams: called");
                 Map<String, String> params = new HashMap<>();
                 params.put("uid", user.getUid());
                 params.put("email", user.getEmail());

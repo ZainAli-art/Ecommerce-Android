@@ -18,15 +18,20 @@ import android.widget.Toast;
 
 import com.example.android.ecommerce.utils.NavigationUtils;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.tasks.Task;
 
+import java.util.Arrays;
+
 public class SignInFragment extends Fragment implements View.OnClickListener {
-    private static final String TAG = "SignInFragment";
     private static final int RC_SIGN_IN = 1;
-    private SignInButton googleSignInButton;
 
     private UserViewModel userViewModel;
 
@@ -45,13 +50,33 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // initialize components
-        googleSignInButton = view.findViewById(R.id.googleSignInButton);
-        googleSignInButton.setOnClickListener(this);
+        SignInButton googleSignInButton = view.findViewById(R.id.googleSignInBtn);
+        LoginButton facebookLoginBtn = view.findViewById(R.id.facebookLoginBtn);
         userViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication()))
                 .get(UserViewModel.class);
         NavController navController = NavHostFragment.findNavController(this);
+
+        googleSignInButton.setOnClickListener(this);
+        facebookLoginBtn.setPermissions(Arrays.asList("email", "public_profile"));
+        facebookLoginBtn.registerCallback(userViewModel.getFacebookCallbackManager(), new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                userViewModel.loginFromFacebookAccessToken(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+
+            }
+        });
+        facebookLoginBtn.setOnClickListener(this);
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             if (user != null && NavigationUtils.isValidInContext(navController, R.id.signInFragment)) {
@@ -62,18 +87,22 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        userViewModel.getFacebookCallbackManager().onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             userViewModel.signInFromGoogleSignInTask(task);
         }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.googleSignInButton:
+            case R.id.googleSignInBtn:
                 googleSignIn();
+                break;
+            case R.id.facebookLoginBtn:
+                facebookLogin();
                 break;
             default:
                 Toast.makeText(getContext(), "No functionality assigned yet.", Toast.LENGTH_SHORT).show();
@@ -81,8 +110,11 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
     }
 
     private void googleSignIn() {
-        Log.d(TAG, "googleSignIn: called");
         Intent intent = userViewModel.getGoogleSignInClient().getSignInIntent();
         startActivityForResult(intent, RC_SIGN_IN);
+    }
+
+    private void facebookLogin() {
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
     }
 }
