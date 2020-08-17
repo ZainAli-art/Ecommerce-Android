@@ -15,7 +15,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,21 +25,13 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.model.Category;
 import com.example.android.ecommerce.utils.ByteUtil;
 import com.example.android.ecommerce.viewmodel.CategoryViewModel;
-import com.example.android.ecommerce.viewmodel.CustomerViewModel;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class AddProductFragment extends Fragment implements View.OnClickListener {
     public static final int REQUEST_PERMISSION_READ_EXTERNAL = 1;
@@ -92,7 +83,7 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
             for (Category c : categories) catSpinnerItems[index++] = c.getName();
         });
 
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, catSpinnerItems);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_item, catSpinnerItems);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         catSpinner = view.findViewById(R.id.catSpinner);
         catSpinner.setAdapter(spinnerAdapter);

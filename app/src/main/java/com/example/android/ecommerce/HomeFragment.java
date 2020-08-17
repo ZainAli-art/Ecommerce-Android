@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,19 +21,18 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.model.Category;
+import com.example.android.ecommerce.utils.NavigationUtils;
 import com.example.android.ecommerce.viewmodel.CategoryViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends Fragment implements View.OnClickListener {
+public class HomeFragment extends Fragment {
     public static final int REQUEST_INTERNET = 1;
     public static final String SELECTED_CAT_ID = "com.example.android.ecommerce.HomeFragment.cat_id";
 
     private RecyclerView categoryRecyclerView;
-    private FloatingActionButton addProductFab;
     private CategoryRecyclerViewAdapter adapter;
     private NavController navController;
     private CategoryViewModel categoryViewModel;
@@ -62,9 +60,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         categoryRecyclerView = view.findViewById(R.id.categoryRecyclerView);
         adapter = new CategoryRecyclerViewAdapter(new ArrayList<Category>());
         categoryRecyclerView.setAdapter(adapter);
-        addProductFab = view.findViewById(R.id.addProductFab);
-        navController = Navigation.findNavController(view);
-        addProductFab.setOnClickListener(this);
+        navController = NavHostFragment.findNavController(this);
         categoryViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -77,12 +73,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         // check if any user was previously logged in
         userViewModel.setUser(userViewModel.getLastSignedInUser());
 
-        userViewModel.getUser().observe(requireActivity(), user -> {
-            if (user == null) {
-                navController.navigate(R.id.signInFragment);
+        userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+            if (user == null && NavigationUtils.isValidInContext(navController, R.id.homeFragment)) {
+                navController.navigate(R.id.action_homeFragment_to_signInFragment);
             }
         });
-        categoryViewModel.getCategories().observe(requireActivity(), categories -> {
+
+        categoryViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
             adapter.setCatList(categories);
         });
 
@@ -94,20 +91,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_INTERNET) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 categoryViewModel.refreshCategories();
             } else {
                 Toast.makeText(requireContext(), "Internet Permission Denied", Toast.LENGTH_SHORT).show();
             }
-        }
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.addProductFab:
-                navController.navigate(R.id.action_homeFragment_to_addProductFragment);
-                break;
         }
     }
 

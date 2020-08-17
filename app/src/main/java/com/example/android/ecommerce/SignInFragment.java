@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.android.ecommerce.utils.NavigationUtils;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -28,7 +29,6 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
     private SignInButton googleSignInButton;
 
     private UserViewModel userViewModel;
-    private NavController navController;
 
     public SignInFragment() {
         // Required empty public constructor
@@ -45,16 +45,16 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // initialize components
-        navController = Navigation.findNavController(view);
         googleSignInButton = view.findViewById(R.id.googleSignInButton);
         googleSignInButton.setOnClickListener(this);
         userViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication()))
                 .get(UserViewModel.class);
+        NavController navController = NavHostFragment.findNavController(this);
 
-        userViewModel.getUser().observe(requireActivity(), user -> {
-            if (user != null) {
+        userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+            if (user != null && NavigationUtils.isValidInContext(navController, R.id.signInFragment)) {
                 navController.popBackStack();
             }
         });

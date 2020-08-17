@@ -8,7 +8,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.android.ecommerce.utils.NavigationUtils;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
@@ -49,10 +52,17 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         TextView email = view.findViewById(R.id.email);
         Button signOutBtn = view.findViewById(R.id.signOutBtn);
         signOutBtn.setOnClickListener(this);
+        NavController navController = NavHostFragment.findNavController(this);
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             if (user == null) {
-                navController.popBackStack(R.id.homeFragment, true);
+                if (NavigationUtils.isValidInContext(navController, R.id.profileFragment)) {
+                    NavHostFragment.findNavController(this).popBackStack();
+                    NavOptions options = new NavOptions.Builder()
+                            .setPopUpTo(R.id.homeFragment, true)
+                            .build();
+                    navController.navigate(R.id.homeFragment, null, options);
+                }
             } else {
                 Uri imgUrl = user.getImgUrl();
                 if (imgUrl != null)

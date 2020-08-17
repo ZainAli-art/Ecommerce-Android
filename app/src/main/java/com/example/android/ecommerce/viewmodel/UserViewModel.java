@@ -77,6 +77,7 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     public void setUser(User user) {
+        Log.d(TAG, "setUser user is: " + user);
         addUserToServer(user);
         mUser.setValue(user);
     }

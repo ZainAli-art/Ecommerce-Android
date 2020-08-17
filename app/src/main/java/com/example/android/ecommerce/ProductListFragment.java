@@ -51,7 +51,7 @@ public class ProductListFragment extends Fragment {
         String catId = args.getString(HomeFragment.SELECTED_CAT_ID);
 
         // observers
-        productViewModel.getProducts().observe(requireActivity(), products -> {
+        productViewModel.getProducts().observe(getViewLifecycleOwner(), products -> {
             adapter.setProductList(products);
         });
 
