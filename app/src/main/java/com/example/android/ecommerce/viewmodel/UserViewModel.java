@@ -20,11 +20,9 @@ import com.example.android.ecommerce.model.User;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -127,6 +125,8 @@ public class UserViewModel extends AndroidViewModel {
                     Log.d(TAG, "onCompleted: new user set via facebook");
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    Log.d(TAG, "onCompleted error: " + e.getMessage());
+                } catch (NullPointerException e) {
                     Log.d(TAG, "onCompleted error: " + e.getMessage());
                 }
             }
