@@ -28,28 +28,40 @@ import java.util.Map;
 import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class ProductViewModel extends AndroidViewModel {
-    public static final String FETCH_PRODUCTS_URL = HOST_URL + "scripts/products-by-cat_id-json.php";
+    public static final String FETCH_PRODUCTS_BY_CAT_ID_URL = HOST_URL + "scripts/products-by-cat_id-json.php";
+    public static final String FETCH_RECENT_PRODUCTS_URL = HOST_URL + "scripts/fetch-recent-products-by-limit-json.php";
     public static final String UPLOAD_PRODUCT_URL = HOST_URL + "scripts/upload-product.php";
 
     private Context mContext;
     private MutableLiveData<List<Product>> products;
+    private MutableLiveData<List<Product>> recentProducts;
 
     public ProductViewModel(@NonNull Application application) {
         super(application);
         mContext = application.getApplicationContext();
         products = new MutableLiveData<>();
+        recentProducts = new MutableLiveData<>();
     }
 
     public LiveData<List<Product>> getProducts() {
         return products;
     }
 
-    public void setProductList(List<Product> productList) {
-        products.setValue(productList);
+    public LiveData<List<Product>> getRecentProducts() {
+        return recentProducts;
+    }
+
+    private Product getProduct(JSONObject jsonObject) throws JSONException {
+        long pid = jsonObject.getLong("pid");
+        long cid = jsonObject.getLong("cat_id");
+        String name = jsonObject.getString("pname");
+        String imgUrl = HOST_URL + jsonObject.getString("img_dir");
+
+        return new Product(pid, cid, name, imgUrl);
     }
 
     public void fetchProducts(String catId) {
-        Uri.Builder builder = Uri.parse(FETCH_PRODUCTS_URL).buildUpon();
+        Uri.Builder builder = Uri.parse(FETCH_PRODUCTS_BY_CAT_ID_URL).buildUpon();
         builder.appendQueryParameter("cat_id", catId);
 
         JsonArrayRequest request = new JsonArrayRequest(
@@ -58,23 +70,43 @@ public class ProductViewModel extends AndroidViewModel {
                 null,
                 response -> {
                     try {
-                        List<Product> products = new ArrayList<>();
+                        List<Product> pList = new ArrayList<>();
                         for (int i = 0; i < response.length(); i++) {
-                            JSONObject jsonObject = response.getJSONObject(i);
-                            long pid = jsonObject.getLong("pid");
-                            long cid = jsonObject.getLong("cat_id");
-                            String name = jsonObject.getString("pname");
-                            String imgUrl = HOST_URL + jsonObject.getString("img_dir");
-
-                            products.add(new Product(pid, cid, name, imgUrl));
+                            pList.add(getProduct(response.getJSONObject(i)));
                         }
-                        setProductList(products);
+                        products.setValue(pList);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 },
                 error -> {
                 }
+        );
+
+        MySingleton.getInstance(mContext).enqueueRequest(request);
+    }
+
+    public void fetchRecentProducts() {
+        String recentProductsUrl = Uri.parse(FETCH_RECENT_PRODUCTS_URL)
+                .buildUpon()
+                .appendQueryParameter("limit", "5")
+                .build()
+                .toString();
+
+        JsonArrayRequest request = new JsonArrayRequest(
+                recentProductsUrl,
+                response -> {
+                    try {
+                        List<Product> pList = new ArrayList<>();
+                        for (int i = 0; i < response.length(); i++) {
+                            pList.add(getProduct(response.getJSONObject(i)));
+                        }
+                        recentProducts.setValue(pList);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {}
         );
 
         MySingleton.getInstance(mContext).enqueueRequest(request);

@@ -18,22 +18,27 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.android.ecommerce.adapters.CategoryRecyclerViewAdapter;
+import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
 import com.example.android.ecommerce.model.Category;
+import com.example.android.ecommerce.model.Product;
 import com.example.android.ecommerce.utils.NavigationUtils;
 import com.example.android.ecommerce.viewmodel.CategoryViewModel;
+import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
 import java.util.List;
 
-public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapter.CategoryItemListener {
+public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapter.CategoryItemListener,
+        ProductRecyclerViewAdapter.ProductItemListener {
     public static final int REQUEST_INTERNET = 1;
     public static final String SELECTED_CAT_ID = "com.example.android.ecommerce.HomeFragment.cat_id";
 
     private List<Category> categories;
-    private CategoryRecyclerViewAdapter adapter;
+    private List<Product> recentProducts;
     private NavController navController;
     private CategoryViewModel categoryViewModel;
     private UserViewModel userViewModel;
+    private ProductViewModel productViewModel;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -51,8 +56,13 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         super.onViewCreated(view, savedInstanceState);
 
         RecyclerView categoryRecyclerView = view.findViewById(R.id.categoryRecyclerView);
-        adapter = new CategoryRecyclerViewAdapter(Category.HORIZONTAL_TYPE, this);
-        categoryRecyclerView.setAdapter(adapter);
+        CategoryRecyclerViewAdapter categoryAdapter = new CategoryRecyclerViewAdapter(Category.HORIZONTAL_TYPE, this);
+        categoryRecyclerView.setAdapter(categoryAdapter);
+
+        RecyclerView recentProductsRecyclerView = view.findViewById(R.id.recentProductsRecyclerView);
+        ProductRecyclerViewAdapter recentProductsAdapter = new ProductRecyclerViewAdapter(Product.HORIZONTAL_TYPE, this);
+        recentProductsRecyclerView.setAdapter(recentProductsAdapter);
+
         navController = NavHostFragment.findNavController(this);
         categoryViewModel = new ViewModelProvider(
                 requireActivity(),
@@ -62,6 +72,10 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(UserViewModel.class);
+        productViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(ProductViewModel.class);
 
         // check if any user was previously logged in
         userViewModel.signInLastSignedInUser();
@@ -71,10 +85,13 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
                 navController.navigate(R.id.action_homeFragment_to_signInFragment);
             }
         });
-
         categoryViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
             this.categories = categories;
-            adapter.setCategories(categories);
+            categoryAdapter.setCategories(categories);
+        });
+        productViewModel.getRecentProducts().observe(getViewLifecycleOwner(), recentProducts -> {
+            this.recentProducts = recentProducts;
+            recentProductsAdapter.setProducts(recentProducts);
         });
 
         requestPermissions(new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET);
@@ -87,6 +104,7 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         if (requestCode == REQUEST_INTERNET) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 categoryViewModel.refreshCategories();
+                productViewModel.fetchRecentProducts();
             } else {
                 Toast.makeText(requireContext(), "Internet Permission Denied", Toast.LENGTH_SHORT).show();
             }
@@ -95,12 +113,15 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
 
     @Override
     public void onClickCategory(int pos) {
-        NavController navController = NavHostFragment.findNavController(HomeFragment.this);
-
         String catId = String.valueOf(categories.get(pos).getId());
         Bundle args = new Bundle();
         args.putString(SELECTED_CAT_ID, catId);
 
         navController.navigate(R.id.action_homeFragment_to_productListFragment, args);
+    }
+
+    @Override
+    public void onClickProduct(int pos) {
+
     }
 }

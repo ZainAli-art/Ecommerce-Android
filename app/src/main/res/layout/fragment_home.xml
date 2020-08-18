@@ -28,7 +28,6 @@
             <TextView
                 android:textStyle="bold"
                 android:padding="8dp"
-                android:id="@+id/catTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/categories" />
@@ -41,6 +40,20 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/category_list_item_horizontal" />
 
+            <TextView
+                android:textStyle="bold"
+                android:padding="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/recent_products" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recentProductsRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/category_list_item_horizontal" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
