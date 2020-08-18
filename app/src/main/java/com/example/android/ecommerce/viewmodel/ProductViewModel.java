@@ -80,7 +80,7 @@ public class ProductViewModel extends AndroidViewModel {
         MySingleton.getInstance(mContext).enqueueRequest(request);
     }
 
-    public void uploadProduct(String pName, String catId, String img) {
+    public void uploadProduct(String pName, String catId, String img, String price) {
         StringRequest request = new StringRequest(
                 Request.Method.POST,
                 UPLOAD_PRODUCT_URL,
@@ -97,6 +97,7 @@ public class ProductViewModel extends AndroidViewModel {
                 params.put("image", img);
                 params.put("pname", pName);
                 params.put("cat_id", catId);
+                params.put("price", price);
                 return params;
             }
         };

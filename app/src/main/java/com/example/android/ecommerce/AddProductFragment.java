@@ -39,8 +39,8 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
 
     private ImageView productImgView;
     private EditText productName;
-    private Button uploadProductBtn;
     private Spinner catSpinner;
+    private EditText priceText;
     private NavController navController;
     private CategoryViewModel categoryViewModel;
     private ProductViewModel productViewModel;
@@ -65,8 +65,8 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
         navController = Navigation.findNavController(view);
         productImgView = view.findViewById(R.id.productImgView);
         productName = view.findViewById(R.id.productName);
-        uploadProductBtn = view.findViewById(R.id.uploadProductBtn);
-        uploadProductBtn.setOnClickListener(this);
+        priceText = view.findViewById(R.id.price);
+        view.findViewById(R.id.uploadProductBtn).setOnClickListener(this);
         categoryViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -123,11 +123,12 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
                 if (bitmap == null) {
                     Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
                 } else {
-                    String img = ByteUtil.BitmapToString(bitmap);
-                    String catId = String.valueOf(categoryViewModel.getCatIdByName(catSpinner.getSelectedItem().toString()));
                     String pName = productName.getText().toString();
+                    String catId = String.valueOf(categoryViewModel.getCatIdByName(catSpinner.getSelectedItem().toString()));
+                    String img = ByteUtil.BitmapToString(bitmap);
+                    String price = priceText.getText().toString();
 
-                    productViewModel.uploadProduct(pName, catId, img);
+                    productViewModel.uploadProduct(pName, catId, img, price);
                     navController.popBackStack();
                 }
                 break;
