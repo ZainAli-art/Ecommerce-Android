@@ -1,6 +1,9 @@
 package com.example.android.ecommerce.model;
 
 public class Product {
+    public static final int VERTICAL_TYPE = 0;
+    public static final int HORIZONTAL_TYPE = 1;
+
     private long id;
     private long catId;
     private String name;

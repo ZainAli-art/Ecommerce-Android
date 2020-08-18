@@ -1,6 +1,9 @@
 package com.example.android.ecommerce.model;
 
 public class Category {
+    public static final int VERTICAL_TYPE = 1;
+    public static final int HORIZONTAL_TYPE = 0;
+
     private long id;
     private String name;
     private String imgUrl;

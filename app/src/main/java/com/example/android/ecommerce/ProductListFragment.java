@@ -11,19 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
+import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
 import com.example.android.ecommerce.model.Product;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class ProductListFragment extends Fragment {
+public class ProductListFragment extends Fragment implements ProductRecyclerViewAdapter.ProductItemListener {
     private RecyclerView productListRecyclerView;
-    private ProductListRecyclerViewAdapter adapter;
+    private ProductRecyclerViewAdapter adapter;
     private ProductViewModel productViewModel;
 
     public ProductListFragment() {
@@ -41,7 +35,7 @@ public class ProductListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         productListRecyclerView = view.findViewById(R.id.productListRecyclerView);
-        adapter = new ProductListRecyclerViewAdapter(new ArrayList<Product>());
+        adapter = new ProductRecyclerViewAdapter(Product.VERTICAL_TYPE, this);
         productListRecyclerView.setAdapter(adapter);
         productViewModel = new ViewModelProvider(
                 requireActivity(),
@@ -52,63 +46,14 @@ public class ProductListFragment extends Fragment {
 
         // observers
         productViewModel.getProducts().observe(getViewLifecycleOwner(), products -> {
-            adapter.setProductList(products);
+            adapter.setProducts(products);
         });
 
         productViewModel.fetchProducts(catId);
     }
 
-    public class ProductListRecyclerViewAdapter extends RecyclerView.Adapter<ProductListRecyclerViewAdapter.PViewHolder> {
-        private List<Product> productList;
-
-        public ProductListRecyclerViewAdapter(List<Product> productList) {
-            this.productList = productList;
-        }
-
-        public void setProductList(List<Product> productList) {
-            this.productList = productList;
-            notifyDataSetChanged();
-        }
-
-        @NonNull
-        @Override
-        public PViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.product_list_item, parent, false);
-            return new PViewHolder(itemView);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull PViewHolder holder, int position) {
-            Product mProduct = productList.get(position);
-            holder.setImage(mProduct.getImgUrl());
-            holder.setText(mProduct.getName());
-        }
-
-        @Override
-        public int getItemCount() {
-            if (productList != null)
-                return productList.size();
-            return 0;
-        }
-
-        public class PViewHolder extends RecyclerView.ViewHolder {
-            private ImageView pImage;
-            private TextView pText;
-
-            public PViewHolder(@NonNull View itemView) {
-                super(itemView);
-                pImage = itemView.findViewById(R.id.pImage);
-                pText = itemView.findViewById(R.id.pText);
-            }
-
-            public void setImage(String imgUrl) {
-                Glide.with(requireActivity()).load(imgUrl).into(pImage);
-            }
-
-            public void setText(CharSequence text) {
-                pText.setText(text);
-            }
-        }
+    @Override
+    public void onClickProduct(int pos) {
+        // TODO: opens product details
     }
 }
