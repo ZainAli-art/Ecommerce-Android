@@ -13,9 +13,11 @@ import androidx.lifecycle.MutableLiveData;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.example.android.ecommerce.MySingleton;
 import com.example.android.ecommerce.model.Product;
+import com.example.android.ecommerce.model.ProductDetails;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +30,7 @@ import java.util.Map;
 import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class ProductViewModel extends AndroidViewModel {
+    public static final String FETCH_PRODUCT_BY_UID_URL = HOST_URL + "scripts/fetch-product-details-by-pid-json.php";
     public static final String FETCH_PRODUCTS_BY_CAT_ID_URL = HOST_URL + "scripts/products-by-cat_id-json.php";
     public static final String FETCH_RECENT_PRODUCTS_URL = HOST_URL + "scripts/fetch-recent-products-by-limit-json.php";
     public static final String UPLOAD_PRODUCT_URL = HOST_URL + "scripts/upload-product.php";
@@ -35,12 +38,14 @@ public class ProductViewModel extends AndroidViewModel {
     private Context mContext;
     private MutableLiveData<List<Product>> products;
     private MutableLiveData<List<Product>> recentProducts;
+    private MutableLiveData<ProductDetails> detailedProduct;
 
     public ProductViewModel(@NonNull Application application) {
         super(application);
         mContext = application.getApplicationContext();
         products = new MutableLiveData<>();
         recentProducts = new MutableLiveData<>();
+        detailedProduct = new MutableLiveData<>();
     }
 
     public LiveData<List<Product>> getProducts() {
@@ -49,6 +54,10 @@ public class ProductViewModel extends AndroidViewModel {
 
     public LiveData<List<Product>> getRecentProducts() {
         return recentProducts;
+    }
+
+    public LiveData<ProductDetails> getDetailedProduct() {
+        return detailedProduct;
     }
 
     private Product getProduct(JSONObject jsonObject) throws JSONException {
@@ -60,7 +69,42 @@ public class ProductViewModel extends AndroidViewModel {
         return new Product(pid, cid, name, imgUrl);
     }
 
-    public void fetchProducts(String catId) {
+    private ProductDetails getProductDetails(JSONObject jsonObject) throws JSONException {
+        long pid = jsonObject.getLong("pid");
+        String product = jsonObject.getString("product");
+        String category = jsonObject.getString("category");
+        String imgUrl = HOST_URL + jsonObject.getString("img_dir");
+        String date = jsonObject.getString("upload_time").split("\\s+")[0];
+        double price = jsonObject.getLong("price");
+
+        return new ProductDetails(pid, product, category, imgUrl, date, price);
+    }
+
+    public void fetchProductDetailsByPid(String pid) {
+        String url = Uri.parse(FETCH_PRODUCT_BY_UID_URL)
+                .buildUpon()
+                .appendQueryParameter("pid", pid)
+                .build()
+                .toString();
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                response -> {
+                    try {
+                        detailedProduct.setValue(getProductDetails(response));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {}
+        );
+
+        MySingleton.getInstance(mContext).enqueueRequest(request);
+    }
+
+    public void fetchProductsByCatId(String catId) {
         Uri.Builder builder = Uri.parse(FETCH_PRODUCTS_BY_CAT_ID_URL).buildUpon();
         builder.appendQueryParameter("cat_id", catId);
 

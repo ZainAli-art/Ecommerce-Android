@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -98,6 +99,17 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        int internetPermission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.INTERNET);
+
+        if (internetPermission == PackageManager.PERMISSION_GRANTED) {
+            categoryViewModel.refreshCategories();
+            productViewModel.fetchRecentProducts();
+        }
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
@@ -122,6 +134,10 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
 
     @Override
     public void onClickProduct(int pos) {
+        Bundle args = new Bundle();
+        String pid = String.valueOf(recentProducts.get(pos).getId());
+        args.putString(ProductDetailsFragment.PRODUCT_ID, pid);
 
+        navController.navigate(R.id.action_homeFragment_to_productDetailsFragment, args);
     }
 }

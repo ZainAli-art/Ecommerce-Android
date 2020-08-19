@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -15,10 +17,12 @@ import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
 import com.example.android.ecommerce.model.Product;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
 
+import java.util.List;
+
 public class ProductListFragment extends Fragment implements ProductRecyclerViewAdapter.ProductItemListener {
-    private RecyclerView productListRecyclerView;
+    private NavController navController;
     private ProductRecyclerViewAdapter adapter;
-    private ProductViewModel productViewModel;
+    private List<Product> products;
 
     public ProductListFragment() {
         // Required empty public constructor
@@ -34,10 +38,12 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        productListRecyclerView = view.findViewById(R.id.productListRecyclerView);
+
+        navController = NavHostFragment.findNavController(this);
+        RecyclerView productListRecyclerView = view.findViewById(R.id.productListRecyclerView);
         adapter = new ProductRecyclerViewAdapter(Product.VERTICAL_TYPE, this);
         productListRecyclerView.setAdapter(adapter);
-        productViewModel = new ViewModelProvider(
+        ProductViewModel productViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(ProductViewModel.class);
@@ -46,14 +52,19 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
 
         // observers
         productViewModel.getProducts().observe(getViewLifecycleOwner(), products -> {
+            this.products = products;
             adapter.setProducts(products);
         });
 
-        productViewModel.fetchProducts(catId);
+        productViewModel.fetchProductsByCatId(catId);
     }
 
     @Override
     public void onClickProduct(int pos) {
-        // TODO: opens product details
+        Bundle args = new Bundle();
+        String pid = String.valueOf(products.get(pos).getId());
+        args.putString(ProductDetailsFragment.PRODUCT_ID, pid);
+
+        navController.navigate(R.id.action_productListFragment_to_productDetailsFragment, args);
     }
 }
