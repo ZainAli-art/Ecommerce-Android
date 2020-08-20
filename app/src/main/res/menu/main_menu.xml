@@ -10,8 +10,12 @@
             android:icon="@drawable/ic_baseline_add_box_24"
             android:title="Add Product"/>
         <item
+            android:id="@+id/cartFragment"
+            android:icon="@drawable/ic_baseline_shopping_cart_24"
+            android:title="Cart"/>
+        <item
             android:id="@+id/profileFragment"
             android:icon="@drawable/ic_baseline_person_24"
-            android:title="Profile"/>
+            android:title="Account"/>
     </group>
 </menu>
