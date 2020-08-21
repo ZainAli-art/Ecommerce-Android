@@ -6,23 +6,26 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
-import com.example.android.ecommerce.model.Product;
+import com.example.android.ecommerce.adapters.OrderedProductRecyclerViewAdapter;
 import com.example.android.ecommerce.viewmodel.CartViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
-public class CartFragment extends Fragment implements ProductRecyclerViewAdapter.ProductItemListener {
+public class CartFragment extends Fragment implements OrderedProductRecyclerViewAdapter.OrderedProductItemListener {
+    private NavController navController;
     private RecyclerView cartRecyclerView;
     private CartViewModel cartViewModel;
     private UserViewModel userViewModel;
 
     private String uid;
+    private OrderedProductRecyclerViewAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -34,8 +37,10 @@ public class CartFragment extends Fragment implements ProductRecyclerViewAdapter
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        navController = NavHostFragment.findNavController(this);
+
         cartRecyclerView = view.findViewById(R.id.cartRecyclerView);
-        ProductRecyclerViewAdapter adapter = new ProductRecyclerViewAdapter(Product.VERTICAL_TYPE, this);
+        adapter = new OrderedProductRecyclerViewAdapter(this);
         cartRecyclerView.setAdapter(adapter);
 
         cartViewModel = new ViewModelProvider(
@@ -49,18 +54,36 @@ public class CartFragment extends Fragment implements ProductRecyclerViewAdapter
         uid = userViewModel.getUser().getValue().getUid();
 
         cartViewModel.getCartProducts().observe(getViewLifecycleOwner(), cartProducts -> {
-            adapter.setProducts(cartProducts);
+            adapter.setOrderedProducts(cartProducts);
         });
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        cartViewModel.fetchCartProducts(uid);
+        refreshCart();
     }
 
     @Override
-    public void onClickProduct(int pos) {
-        // no functionality assigned yet
+    public void onClickOrderedProduct(int pos) {
+        Bundle args = new Bundle();
+        String oid = String.valueOf(cartViewModel.getCartProducts().getValue().get(pos).getOid());
+        args.putString(OrderDetailsFragment.ORDER_DETAILS_ID, oid);
+        args.putString(OrderDetailsFragment.USER_ID, uid);
+
+        navController.navigate(R.id.action_cartFragment_to_orderDetailsFragment, args);
+    }
+
+    @Override
+    public void onClickDeleteOrderedProduct(int pos) {
+        String oid = String.valueOf(cartViewModel.getCartProducts().getValue().get(pos).getOid());
+        cartViewModel.deleteOrder(oid);
+        adapter.getOrderedProducts().remove(pos);
+        adapter.notifyItemRemoved(pos);
+//        refreshCart();
+    }
+
+    private void refreshCart() {
+        cartViewModel.fetchCartProducts(uid);
     }
 }
