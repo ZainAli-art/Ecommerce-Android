@@ -28,10 +28,11 @@ import java.util.Map;
 import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class CartViewModel extends AndroidViewModel {
-    public static final String ADD_TO_CART_URL = HOST_URL + "scripts/add-order.php";
-    public static final String FETCH_CART_PRODUCTS_URL = HOST_URL + "scripts/ordered-products-by-uid-json.php";
-    public static final String FETCH_ORDER_DETAILS_URL = HOST_URL + "scripts/order-details-by-oid-json.php";
-    public static final String DELETE_ORDER_URL = HOST_URL + "scripts/delete-order-by-oid.php";
+    public static final String BASE_URL = HOST_URL + "scripts/order/";
+    public static final String ADD_TO_CART_URL = BASE_URL + "add-order.php";
+    public static final String FETCH_CART_PRODUCTS_URL = BASE_URL + "ordered-products-by-uid-json.php";
+    public static final String FETCH_ORDER_DETAILS_URL = BASE_URL + "order-details-by-oid-json.php";
+    public static final String DELETE_ORDER_URL = BASE_URL + "delete-order-by-oid.php";
     private Context mContext;
 
     private MutableLiveData<List<OrderedProduct>> cartProducts;

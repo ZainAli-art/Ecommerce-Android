@@ -3,6 +3,7 @@ package com.example.android.ecommerce.viewmodel;
 import android.app.Application;
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,10 +31,13 @@ import java.util.Map;
 import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class ProductViewModel extends AndroidViewModel {
-    public static final String FETCH_PRODUCT_BY_UID_URL = HOST_URL + "scripts/fetch-product-details-by-pid-json.php";
-    public static final String FETCH_PRODUCTS_BY_CAT_ID_URL = HOST_URL + "scripts/products-by-cat_id-json.php";
-    public static final String FETCH_RECENT_PRODUCTS_URL = HOST_URL + "scripts/fetch-recent-products-by-limit-json.php";
-    public static final String UPLOAD_PRODUCT_URL = HOST_URL + "scripts/upload-product.php";
+    private static final String TAG = "ProductViewModel";
+
+    public static final String BASE_URL = HOST_URL + "scripts/product/";
+    public static final String FETCH_PRODUCT_BY_UID_URL = BASE_URL + "fetch-product-details-by-pid-json.php";
+    public static final String FETCH_PRODUCTS_BY_CAT_ID_URL = BASE_URL + "products-by-cat_id-json.php";
+    public static final String FETCH_RECENT_PRODUCTS_URL = BASE_URL + "fetch-recent-products-by-limit-json.php";
+    public static final String UPLOAD_PRODUCT_URL = BASE_URL + "upload-product.php";
 
     private Context mContext;
     private MutableLiveData<List<Product>> products;
@@ -161,6 +165,7 @@ public class ProductViewModel extends AndroidViewModel {
                 Request.Method.POST,
                 UPLOAD_PRODUCT_URL,
                 response -> {
+                    Log.d(TAG, "uploadProduct response: " + response);
                     Toast.makeText(mContext, "Product Uploaded Successfully.", Toast.LENGTH_SHORT).show();
                 },
                 error -> {

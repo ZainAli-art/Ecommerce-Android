@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -25,6 +26,8 @@ import java.util.concurrent.ExecutionException;
 import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
+    private static final String TAG = "MyFirebaseMessagingServ";
+
     public static final String BASE_URL = HOST_URL + "scripts/fcm/";
     public static final String UPDATE_FCM_TOKEN_URL = BASE_URL + "update-fcm-token.php";
     public static final String ADD_FCM_TOKEN_URL = BASE_URL + "add-fcm-token.php";
@@ -49,8 +52,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+        Log.d(TAG, "onMessageReceived: new");
+
         super.onMessageReceived(remoteMessage);
-        if (remoteMessage.getNotification() == null) return;
+        if (remoteMessage.getNotification() == null) {
+            Log.d(TAG, "onMessageReceived: notification is null");
+            return;
+        }
 
         String title = remoteMessage.getNotification().getTitle();
         String body = remoteMessage.getNotification().getBody();
@@ -72,7 +80,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification notification = new NotificationCompat.Builder(this, getString(R.string.trans_channel_desc))
+        Notification notification = new NotificationCompat.Builder(this, getString(R.string.trans_channel_id))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)    // required
                 .setLargeIcon(largeIcon)
                 .setContentTitle(title)

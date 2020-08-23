@@ -37,9 +37,11 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.android.ecommerce.MySingleton.HOST_URL;
+
 public class UserViewModel extends AndroidViewModel {
-    private static final String TAG = "UserViewModel";
-    private static final String ADD_USER_URL = MySingleton.HOST_URL + "scripts/add-user.php";
+    public static final String BASE_URL = HOST_URL + "scripts/user/";
+    private static final String ADD_USER_URL = BASE_URL + "add-user.php";
     private Context mContext;
     private MutableLiveData<User> mUser;
     private GoogleSignInOptions gso;
@@ -85,10 +87,8 @@ public class UserViewModel extends AndroidViewModel {
         AccessToken facebookAccessToken;
 
         if ((facebookAccessToken = AccessToken.getCurrentAccessToken()) != null) {
-            Log.d(TAG, "signInLastSignedInUser: previous facebook account is not null");
             loginFromFacebookAccessToken(facebookAccessToken);
         } else if ((googleSignInAccount = GoogleSignIn.getLastSignedInAccount(mContext)) != null) {
-            Log.d(TAG, "signInLastSignedInUser: previous google account is not null");
             setUser(adaptUserFromGoogleSignInAccount(googleSignInAccount));
         } else {
             setUser(null);
@@ -122,12 +122,9 @@ public class UserViewModel extends AndroidViewModel {
                     Uri imgUrl = Uri.parse("https://graph.facebook.com/" + uid + "/picture?type=normal");
 
                     setUser(new User(uid, name, email, imgUrl));
-                    Log.d(TAG, "onCompleted: new user set via facebook");
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Log.d(TAG, "onCompleted error: " + e.getMessage());
                 } catch (NullPointerException e) {
-                    Log.d(TAG, "onCompleted error: " + e.getMessage());
                 }
             }
         });
@@ -139,7 +136,6 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     public void setUser(User user) {
-        Log.d(TAG, "setUser user is: " + user);
         addUserToServer(user);
         mUser.setValue(user);
     }

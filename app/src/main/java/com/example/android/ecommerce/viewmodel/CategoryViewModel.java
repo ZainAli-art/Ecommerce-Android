@@ -24,7 +24,8 @@ import java.util.Map;
 import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class CategoryViewModel extends AndroidViewModel {
-    public static final String CAT_JSON_URL = HOST_URL + "scripts/all-categories-json.php";
+    public static final String BASE_URL = HOST_URL + "scripts/category/";
+    public static final String CAT_JSON_URL = BASE_URL + "all-categories-json.php";
 
     private Context mContext;
     private MutableLiveData<List<Category>> categories;
