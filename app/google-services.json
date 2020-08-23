@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "360704462996",
+    "firebase_url": "https://practice-project-836bc.firebaseio.com",
+    "project_id": "practice-project-836bc",
+    "storage_bucket": "practice-project-836bc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360704462996:android:a3dc097c4c109ecbbf6481",
+        "android_client_info": {
+          "package_name": "com.example.android.ecommerce"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "360704462996-avguc2rm5ovl3usgcocpooivshnbplt3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2stVaDHJnfI78tCBcx2T8SQ8YEwkuzl0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "360704462996-9qde97sc1d293rtv639mfie8bor1q988.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360704462996:android:2730cf33c278d6b3bf6481",
+        "android_client_info": {
+          "package_name": "com.example.android.testapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "360704462996-avguc2rm5ovl3usgcocpooivshnbplt3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2stVaDHJnfI78tCBcx2T8SQ8YEwkuzl0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "360704462996-9qde97sc1d293rtv639mfie8bor1q988.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:360704462996:android:714bb4b0ef7563fbbf6481",
+        "android_client_info": {
+          "package_name": "com.zainchoudhary.bloggingappfirestore.blogging_app_firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "360704462996-avguc2rm5ovl3usgcocpooivshnbplt3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2stVaDHJnfI78tCBcx2T8SQ8YEwkuzl0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "360704462996-9qde97sc1d293rtv639mfie8bor1q988.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
