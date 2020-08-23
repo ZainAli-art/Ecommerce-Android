@@ -6,24 +6,21 @@ import android.app.NotificationManager;
 import android.os.Build;
 
 public class MyApp extends Application {
-    public static final String CHANNEL_ID = "CH_01";
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String channelName = "Transactions";
-            int channelImportance = NotificationManager.IMPORTANCE_HIGH;
-            String channelDesc = "This channel is about all the e-commerce transactions";
-
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, channelName, channelImportance);
-            channel.setDescription(channelDesc);
+            NotificationChannel transChannel = new NotificationChannel(
+                    getString(R.string.trans_channel_id),
+                    getString(R.string.trans_channel_name),
+                    NotificationManager.IMPORTANCE_HIGH);
+            transChannel.setDescription(getString(R.string.trans_channel_desc));
 
 
             NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
-
+            manager.createNotificationChannel(transChannel);
         }
     }
 }

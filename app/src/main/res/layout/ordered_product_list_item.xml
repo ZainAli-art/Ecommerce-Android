@@ -10,6 +10,7 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:contentDescription="@string/cart_list_img"
             android:id="@+id/oImage"
             android:layout_width="100dp"
             android:layout_height="70dp"
@@ -21,9 +22,11 @@
             android:layout_marginHorizontal="8dp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:text="@string/title" />
 
         <ImageButton
+            android:contentDescription="@string/cart_list_del_desc"
+            android:padding="8dp"
             android:id="@+id/delOrderBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

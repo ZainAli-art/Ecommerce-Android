@@ -26,11 +26,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:ems="10"
-        android:hint="Name"
+        android:hint="@string/name"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/productImgView" />
+        app:layout_constraintTop_toBottomOf="@+id/productImgView"/>
 
     <Button
         android:id="@+id/uploadProductBtn"
@@ -41,7 +41,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Upload"
+        android:text="@string/upload"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -64,7 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="$"
+        android:text="@string/price_prefix"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/catSpinner"
         app:layout_constraintTop_toBottomOf="@+id/catSpinner" />

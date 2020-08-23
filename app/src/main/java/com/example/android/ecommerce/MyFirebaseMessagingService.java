@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -23,14 +22,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.example.android.ecommerce.MyApp.CHANNEL_ID;
 import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
-    private static final String TAG = "MyFirebaseMessagingServ";
-
-    public static final String UPDATE_FCM_TOKEN_URL = HOST_URL + "scripts/update-fcm-token.php";
-    public static final String ADD_FCM_TOKEN_URL = HOST_URL + "scripts/add-fcm-token.php";
+    public static final String BASE_URL = HOST_URL + "scripts/fcm/";
+    public static final String UPDATE_FCM_TOKEN_URL = BASE_URL + "update-fcm-token.php";
+    public static final String ADD_FCM_TOKEN_URL = BASE_URL + "add-fcm-token.php";
     public static final int NOTIFICATION_ID = 0;
     public static final String OLD_TOKEN_KEY = "MyFirebaseMessagingService.OLD_TOKEN";
     public static final String PREFERENCES_NAME = "com.example.android.ecommerce.MyFirebaseMessagingService";
@@ -75,7 +72,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, getString(R.string.trans_channel_desc))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)    // required
                 .setLargeIcon(largeIcon)
                 .setContentTitle(title)
@@ -92,9 +89,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 Request.Method.POST,
                 UPDATE_FCM_TOKEN_URL,
                 response -> {
-                    Log.d(TAG, "onNewToken response: " + response);
                 },
-                error -> {}
+                error -> {
+                }
         ) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
@@ -113,7 +110,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 Request.Method.POST,
                 ADD_FCM_TOKEN_URL,
                 response -> {
-                    Log.d(TAG, "addNewTokenOnServer " + response);
                 },
                 error -> {
                     error.printStackTrace();

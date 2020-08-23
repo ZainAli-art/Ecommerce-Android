@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="Sign Out"
+        android:text="@string/sign_out"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -32,6 +32,7 @@
             android:orientation="vertical" >
 
             <ImageView
+                android:contentDescription="@string/profile_pic_desc"
                 android:id="@+id/profileImg"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
@@ -42,7 +43,7 @@
                 android:id="@+id/fullName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Name"
+                android:text="@string/name"
                 android:padding="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
@@ -50,7 +51,7 @@
                 android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Email"
+                android:text="@string/email"
                 android:padding="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
         </LinearLayout>
