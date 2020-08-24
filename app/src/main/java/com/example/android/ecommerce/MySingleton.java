@@ -7,7 +7,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
 public class MySingleton {
-    public static final String HOST_URL = "http://192.168.8.101/";
+    public static final String HOST_URL = "http://192.168.8.102/ecommerce/";
     private static MySingleton mInstance;
 
     private RequestQueue requestQueue;

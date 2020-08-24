@@ -23,7 +23,7 @@ import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
 public class ProductDetailsFragment extends Fragment implements View.OnClickListener {
-    public static final String PRODUCT_ID = "com.example.android.ecommerce.ProductDetailsFragment.PRODUCT_ID";
+    public static final String PRODUCT_ID = "productId";
 
     private ImageView img;
     private TextView name;
