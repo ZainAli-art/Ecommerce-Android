@@ -76,13 +76,16 @@ public class ProductViewModel extends AndroidViewModel {
 
     private ProductDetails getProductDetails(JSONObject jsonObject) throws JSONException {
         long pid = jsonObject.getLong("pid");
+        String sellerId = jsonObject.getString("seller_id");
         String product = jsonObject.getString("product");
         String category = jsonObject.getString("category");
         String imgUrl = HOST_URL + jsonObject.getString("img_dir");
         String date = jsonObject.getString("upload_time").split("\\s+")[0];
         double price = jsonObject.getLong("price");
+        String seller = jsonObject.getString("seller");
+        String contact = jsonObject.getString("contact");
 
-        return new ProductDetails(pid, product, category, imgUrl, date, price);
+        return new ProductDetails(pid, sellerId, product, category, imgUrl, date, price, seller, contact);
     }
 
     public void fetchProductDetailsByPid(String pid) {
@@ -97,6 +100,7 @@ public class ProductViewModel extends AndroidViewModel {
                 url,
                 null,
                 response -> {
+                    Log.d(TAG, "fetchProductDetailsByPid response: " + response);
                     try {
                         detailedProduct.setValue(getProductDetails(response));
                     } catch (JSONException e) {

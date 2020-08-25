@@ -1,24 +1,34 @@
 package com.example.android.ecommerce.model;
 
 public class ProductDetails {
-    private long id;
+    private long pid;
+    private String sellerId;
     private String product;
     private String category;
     private String imgUrl;
     private String date;
     private double price;
+    private String seller;
+    private String contact;
 
-    public ProductDetails(long id, String product, String category, String imgUrl, String date, double price) {
-        this.id = id;
+    public ProductDetails(long pid, String sellerId, String product, String category, String imgUrl, String date, double price, String seller, String contact) {
+        this.pid = pid;
+        this.sellerId = sellerId;
         this.product = product;
         this.category = category;
         this.imgUrl = imgUrl;
         this.date = date;
         this.price = price;
+        this.seller = seller;
+        this.contact = contact;
     }
 
-    public long getId() {
-        return id;
+    public long getPid() {
+        return pid;
+    }
+
+    public String getSellerId() {
+        return sellerId;
     }
 
     public String getProduct() {
@@ -39,5 +49,13 @@ public class ProductDetails {
 
     public double getPrice() {
         return price;
+    }
+
+    public String getSeller() {
+        return seller;
+    }
+
+    public String getContact() {
+        return contact;
     }
 }

@@ -30,6 +30,8 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
     private TextView date;
     private TextView category;
     private TextView price;
+    private TextView seller;
+    private TextView contact;
 
     private ProductViewModel productViewModel;
     private CartViewModel cartViewModel;
@@ -54,6 +56,8 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
         date = view.findViewById(R.id.date);
         category = view.findViewById(R.id.category);
         price = view.findViewById(R.id.price);
+        seller = view.findViewById(R.id.seller);
+        contact = view.findViewById(R.id.contact);
         Button addToCartBtn = view.findViewById(R.id.addToCartBtn);
         addToCartBtn.setOnClickListener(this);
 
@@ -103,6 +107,8 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
         date.setText(productDetails.getDate());
         category.setText(productDetails.getCategory());
         price.setText("$ " + productDetails.getPrice());
+        seller.setText(productDetails.getSeller());
+        contact.setText(productDetails.getContact());
     }
 
     private void addToCart() {
