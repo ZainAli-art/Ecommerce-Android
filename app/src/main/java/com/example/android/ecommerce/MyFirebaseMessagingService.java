@@ -97,6 +97,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 Request.Method.POST,
                 UPDATE_FCM_TOKEN_URL,
                 response -> {
+                    Log.d(TAG, "updateTokenOnServer response: " + response);
                 },
                 error -> {
                 }
@@ -118,6 +119,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 Request.Method.POST,
                 ADD_FCM_TOKEN_URL,
                 response -> {
+                    Log.d(TAG, "addNewTokenOnServer response: " + response);
                 },
                 error -> {
                     error.printStackTrace();

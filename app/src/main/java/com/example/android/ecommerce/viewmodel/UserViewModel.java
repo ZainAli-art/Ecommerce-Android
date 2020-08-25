@@ -29,7 +29,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,8 +43,13 @@ import java.util.Map;
 import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class UserViewModel extends AndroidViewModel {
-    public static final String BASE_URL = HOST_URL + "scripts/user/";
-    private static final String ADD_USER_URL = BASE_URL + "add-user.php";
+    private static final String TAG = "UserViewModel";
+
+    public static final String BASE_USER_URL = HOST_URL + "scripts/user/";
+    public static final String BASE_FCM_URL = HOST_URL + "scripts/fcm/";
+    private static final String ADD_USER_URL = BASE_USER_URL + "add-user.php";
+    private static final String REGISTER_USER_TOKEN_URL = BASE_FCM_URL + "register-user-fcm-token.php";
+    private static final String UNREGISTER_USER_TOKEN_URL = BASE_FCM_URL + "unregister-user-token.php";
     private Context mContext;
     private MutableLiveData<User> mUser;
     private GoogleSignInOptions gso;
@@ -138,6 +146,20 @@ public class UserViewModel extends AndroidViewModel {
     public void setUser(User user) {
         addUserToServer(user);
         mUser.setValue(user);
+
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                String token = instanceIdResult.getToken();
+
+                if (user == null) {
+                    unregisterUserToken(token);
+                } else {
+                    String uid = user.getUid();
+                    registerUserToken(uid, token);
+                }
+            }
+        });
     }
 
     public void signInFromGoogleSignInTask(Task<GoogleSignInAccount> completedTask) {
@@ -187,6 +209,47 @@ public class UserViewModel extends AndroidViewModel {
                 params.put("fullname", user.getFullName());
                 if (user.getImgUrl() != null)
                     params.put("img_dir", user.getImgUrl().toString());
+                return params;
+            }
+        };
+
+        MySingleton.getInstance(mContext).enqueueRequest(request);
+    }
+
+    public void registerUserToken(String uid, String token) {
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                REGISTER_USER_TOKEN_URL,
+                response -> {
+                    Log.d(TAG, "registerUserToken response: " + response);
+                },
+                error -> {}
+        ) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("uid", uid);
+                params.put("token", token);
+                return params;
+            }
+        };
+
+        MySingleton.getInstance(mContext).enqueueRequest(request);
+    }
+
+    public void unregisterUserToken(String token) {
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                UNREGISTER_USER_TOKEN_URL,
+                response -> {
+                    Log.d(TAG, "unregisterUserToken response: " + response);
+                },
+                error -> {}
+        ) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("token", token);
                 return params;
             }
         };
