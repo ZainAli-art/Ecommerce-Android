@@ -66,11 +66,12 @@ public class ProductViewModel extends AndroidViewModel {
 
     private Product getProduct(JSONObject jsonObject) throws JSONException {
         long pid = jsonObject.getLong("pid");
+        String uid = jsonObject.getString("uid");
         long cid = jsonObject.getLong("cat_id");
         String name = jsonObject.getString("pname");
         String imgUrl = HOST_URL + jsonObject.getString("img_dir");
 
-        return new Product(pid, cid, name, imgUrl);
+        return new Product(pid, uid, cid, name, imgUrl);
     }
 
     private ProductDetails getProductDetails(JSONObject jsonObject) throws JSONException {
@@ -160,7 +161,9 @@ public class ProductViewModel extends AndroidViewModel {
         MySingleton.getInstance(mContext).enqueueRequest(request);
     }
 
-    public void uploadProduct(String pName, String catId, String img, String price) {
+    public void uploadProduct(String uid, String pName, String catId, String img, String price) {
+        Log.d(TAG, "uploadProduct uid: " + uid);
+
         StringRequest request = new StringRequest(
                 Request.Method.POST,
                 UPLOAD_PRODUCT_URL,
@@ -175,6 +178,7 @@ public class ProductViewModel extends AndroidViewModel {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
+                params.put("uid", uid);
                 params.put("image", img);
                 params.put("pname", pName);
                 params.put("cat_id", catId);

@@ -62,7 +62,7 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
     @Override
     public void onClickProduct(int pos) {
         Bundle args = new Bundle();
-        String pid = String.valueOf(products.get(pos).getId());
+        String pid = String.valueOf(products.get(pos).getPid());
         args.putString(ProductDetailsFragment.PRODUCT_ID, pid);
 
         navController.navigate(R.id.action_productListFragment_to_productDetailsFragment, args);

@@ -135,7 +135,7 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
     @Override
     public void onClickProduct(int pos) {
         Bundle args = new Bundle();
-        String pid = String.valueOf(recentProducts.get(pos).getId());
+        String pid = String.valueOf(recentProducts.get(pos).getPid());
         args.putString(ProductDetailsFragment.PRODUCT_ID, pid);
 
         navController.navigate(R.id.action_homeFragment_to_productDetailsFragment, args);

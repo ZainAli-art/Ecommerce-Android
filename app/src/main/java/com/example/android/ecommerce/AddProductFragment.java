@@ -30,6 +30,7 @@ import com.example.android.ecommerce.model.Category;
 import com.example.android.ecommerce.utils.ByteUtil;
 import com.example.android.ecommerce.viewmodel.CategoryViewModel;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
+import com.example.android.ecommerce.viewmodel.UserViewModel;
 
 import java.io.IOException;
 
@@ -47,6 +48,7 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
 
     private Bitmap bitmap;
     String[] catSpinnerItems;
+    private UserViewModel userViewModel;
 
     public AddProductFragment() {
         // Required empty public constructor
@@ -67,6 +69,10 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
         productName = view.findViewById(R.id.productName);
         priceText = view.findViewById(R.id.price);
         view.findViewById(R.id.uploadProductBtn).setOnClickListener(this);
+        userViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(UserViewModel.class);
         categoryViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -123,12 +129,13 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
                 if (bitmap == null) {
                     Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
                 } else {
+                    String uid = userViewModel.getUser().getValue().getUid();
                     String pName = productName.getText().toString();
                     String catId = String.valueOf(categoryViewModel.getCatIdByName(catSpinner.getSelectedItem().toString()));
                     String img = ByteUtil.BitmapToString(bitmap);
                     String price = priceText.getText().toString();
 
-                    productViewModel.uploadProduct(pName, catId, img, price);
+                    productViewModel.uploadProduct(uid, pName, catId, img, price);
                     navController.popBackStack();
                 }
                 break;
