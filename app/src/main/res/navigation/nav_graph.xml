@@ -48,7 +48,11 @@
         android:id="@+id/productDetailsFragment"
         android:name="com.example.android.ecommerce.ProductDetailsFragment"
         android:label="fragment_product_details"
-        tools:layout="@layout/fragment_product_details" />
+        tools:layout="@layout/fragment_product_details" >
+        <action
+            android:id="@+id/action_productDetailsFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
     <fragment
         android:id="@+id/cartFragment"
         android:name="com.example.android.ecommerce.CartFragment"
@@ -63,4 +67,9 @@
         android:name="com.example.android.ecommerce.OrderDetailsFragment"
         android:label="fragment_order_details"
         tools:layout="@layout/fragment_order_details" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.android.ecommerce.ChatFragment"
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat" />
 </navigation>

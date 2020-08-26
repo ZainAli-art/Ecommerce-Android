@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
@@ -21,9 +22,14 @@ import com.example.android.ecommerce.model.ProductDetails;
 import com.example.android.ecommerce.viewmodel.CartViewModel;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 public class ProductDetailsFragment extends Fragment implements View.OnClickListener {
     public static final String PRODUCT_ID = "productId";
+
+    private NavController navController;
 
     private ImageView img;
     private TextView name;
@@ -51,6 +57,8 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        navController = NavHostFragment.findNavController(this);
+
         img = view.findViewById(R.id.img);
         name = view.findViewById(R.id.name);
         date = view.findViewById(R.id.date);
@@ -60,6 +68,7 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
         contact = view.findViewById(R.id.contact);
         Button addToCartBtn = view.findViewById(R.id.addToCartBtn);
         addToCartBtn.setOnClickListener(this);
+        view.findViewById(R.id.chatSellerButton).setOnClickListener(this);
 
         productViewModel = new ViewModelProvider(
                 requireActivity(),
@@ -97,6 +106,9 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
             case R.id.addToCartBtn:
                 addToCart();
                 break;
+            case R.id.chatSellerButton:
+                openChat();
+                break;
         }
     }
 
@@ -113,6 +125,21 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
 
     private void addToCart() {
         cartViewModel.addToCart(uid, pid);
-        NavHostFragment.findNavController(this).popBackStack();
+        navController.popBackStack();
+    }
+
+    private void openChat() {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                String senderToken = instanceIdResult.getToken();
+                String receiverToken = productViewModel.getDetailedProduct().getValue().getSellerToken();
+                Bundle args = new Bundle();
+                args.putString(ChatFragment.SENDER_TOKEN_KEY, senderToken);
+                args.putString(ChatFragment.RECEIVER_TOKEN_KEY, receiverToken);
+
+                navController.navigate(R.id.action_productDetailsFragment_to_chatFragment, args);
+            }
+        });
     }
 }

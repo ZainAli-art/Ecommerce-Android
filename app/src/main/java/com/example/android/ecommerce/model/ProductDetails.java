@@ -10,8 +10,9 @@ public class ProductDetails {
     private double price;
     private String seller;
     private String contact;
+    private String sellerToken;
 
-    public ProductDetails(long pid, String sellerId, String product, String category, String imgUrl, String date, double price, String seller, String contact) {
+    public ProductDetails(long pid, String sellerId, String product, String category, String imgUrl, String date, double price, String seller, String contact, String sellerToken) {
         this.pid = pid;
         this.sellerId = sellerId;
         this.product = product;
@@ -21,6 +22,7 @@ public class ProductDetails {
         this.price = price;
         this.seller = seller;
         this.contact = contact;
+        this.sellerToken = sellerToken;
     }
 
     public long getPid() {
@@ -57,5 +59,9 @@ public class ProductDetails {
 
     public String getContact() {
         return contact;
+    }
+
+    public String getSellerToken() {
+        return sellerToken;
     }
 }

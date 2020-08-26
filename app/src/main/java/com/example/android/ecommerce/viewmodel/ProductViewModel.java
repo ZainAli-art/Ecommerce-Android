@@ -85,8 +85,9 @@ public class ProductViewModel extends AndroidViewModel {
         double price = jsonObject.getLong("price");
         String seller = jsonObject.getString("seller");
         String contact = jsonObject.getString("contact");
+        String sellerToken = jsonObject.getString("seller_token");
 
-        return new ProductDetails(pid, sellerId, product, category, imgUrl, date, price, seller, contact);
+        return new ProductDetails(pid, sellerId, product, category, imgUrl, date, price, seller, contact, sellerToken);
     }
 
     public void fetchProductDetailsByPid(String pid) {
