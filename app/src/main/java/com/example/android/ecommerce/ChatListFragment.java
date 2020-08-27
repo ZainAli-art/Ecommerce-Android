@@ -1,13 +1,11 @@
 package com.example.android.ecommerce;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,12 +17,9 @@ import android.view.ViewGroup;
 import com.example.android.ecommerce.adapters.ChatListRecyclerViewAdapter;
 import com.example.android.ecommerce.model.ChatListItem;
 import com.example.android.ecommerce.viewmodel.ChatViewModel;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 
 public class ChatListFragment extends Fragment implements ChatListRecyclerViewAdapter.ChatListItemListener {
-
     private NavController navController;
     private RecyclerView chatListRecyclerView;
     private ChatViewModel chatViewModel;
@@ -79,11 +74,7 @@ public class ChatListFragment extends Fragment implements ChatListRecyclerViewAd
     public void refresh() {
         FirebaseInstanceId.getInstance()
                 .getInstanceId()
-                .addOnSuccessListener(instanceIdResult -> {
-                    Intent intent = new Intent(MainActivity.ACTION_REFRESH_CHAT_LIST);
-                    intent.setPackage(requireActivity().getPackageName());
-                    intent.putExtra("token", instanceIdResult.getToken());
-                    LocalBroadcastManager.getInstance(requireActivity().getApplicationContext()).sendBroadcast(intent);
-                });
+                .addOnSuccessListener(instanceIdResult ->
+                        chatViewModel.fetchChatListItems(instanceIdResult.getToken()));
     }
 }

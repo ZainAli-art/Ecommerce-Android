@@ -20,13 +20,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MainActivity extends AppCompatActivity {
     private static final String BROADCAST_PACKAGE = "com.example.android.broadcast";
     public static final String ACTION_REFRESH_CHAT = BROADCAST_PACKAGE + ".ACTION_REFRESH_CHAT";
-    public static final String ACTION_REFRESH_CHAT_LIST = BROADCAST_PACKAGE + ".ACTION_REFRESH_CHAT_LIST";
 
     private ChatViewModel chatViewModel;
 
     private LocalBroadcastManager localBroadcastManager;
     private RefreshChatBroadcastReceiver mRefreshChatBroadCastReceiver;
-    private RefreshChatListBroadcastReceiver mRefreshChatListBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,17 +55,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mRefreshChatBroadCastReceiver = new RefreshChatBroadcastReceiver();
-        mRefreshChatListBroadcastReceiver = new RefreshChatListBroadcastReceiver();
 
         localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
         localBroadcastManager.registerReceiver(mRefreshChatBroadCastReceiver, new IntentFilter(ACTION_REFRESH_CHAT));
-        localBroadcastManager.registerReceiver(mRefreshChatListBroadcastReceiver, new IntentFilter(ACTION_REFRESH_CHAT_LIST));
     }
 
     @Override
     protected void onDestroy() {
         localBroadcastManager.unregisterReceiver(mRefreshChatBroadCastReceiver);
-        localBroadcastManager.unregisterReceiver(mRefreshChatListBroadcastReceiver);
         super.onDestroy();
     }
 
@@ -79,14 +74,6 @@ public class MainActivity extends AppCompatActivity {
             String pid = intent.getStringExtra("pid");
             chatViewModel.fetchChat(senderToken, receiverToken, pid);
             chatViewModel.fetchChatListItems(receiverToken);
-        }
-    }
-
-    private class RefreshChatListBroadcastReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String token = intent.getStringExtra("token");
-            chatViewModel.fetchChatListItems(token);
         }
     }
 }

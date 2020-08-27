@@ -1,13 +1,11 @@
 package com.example.android.ecommerce;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -101,12 +99,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     }
 
     public void refresh() {
-//        chatViewModel.fetchChat(senderToken, receiverToken);
-        Intent intent = new Intent(MainActivity.ACTION_REFRESH_CHAT);
-        intent.setPackage(requireActivity().getPackageName());
-        intent.putExtra("senderToken", senderToken);
-        intent.putExtra("receiverToken", receiverToken);
-        intent.putExtra("pid", pid);
-        LocalBroadcastManager.getInstance(requireActivity().getApplicationContext()).sendBroadcast(intent);
+        chatViewModel.fetchChat(senderToken, receiverToken, pid);
+        chatViewModel.fetchChatListItems(receiverToken);
     }
 }
