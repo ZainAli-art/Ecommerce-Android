@@ -14,6 +14,7 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.example.android.ecommerce.MySingleton;
 import com.example.android.ecommerce.model.Chat;
+import com.example.android.ecommerce.model.ChatListItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,17 +32,24 @@ public class ChatViewModel extends AndroidViewModel {
 
     public static final String BASE_URL = HOST_URL + "scripts/chat/";
     public static final String SEND_MSG_URL = BASE_URL + "send-new-msg.php";
-    public static final String FETCH_CHAT_URL = BASE_URL + "print-chat-json.php";
+    public static final String FETCH_CHATS_URL = BASE_URL + "print-chat-json.php";
+    public static final String FETCH_CHAT_LIST_ITEMS_URL = BASE_URL + "print-chat-list-json.php";
 
-    private MutableLiveData<List<Chat>> chatList;
+    private MutableLiveData<List<Chat>> chats;
+    private MutableLiveData<List<ChatListItem>> chatListItems;
 
     public ChatViewModel(@NonNull Application application) {
         super(application);
-        chatList = new MutableLiveData<>();
+        chats = new MutableLiveData<>();
+        chatListItems = new MutableLiveData<>();
     }
 
-    public LiveData<List<Chat>> getChatList() {
-        return chatList;
+    public LiveData<List<Chat>> getChats() {
+        return chats;
+    }
+
+    public LiveData<List<ChatListItem>> getChatListItems() {
+        return chatListItems;
     }
 
     private Chat getChat(JSONObject jsonObject) throws JSONException {
@@ -52,6 +60,17 @@ public class ChatViewModel extends AndroidViewModel {
         String time = jsonObject.getString("upload_time");
 
         return new Chat(senderToken, receiverToken, pid, msg, time);
+    }
+
+    private ChatListItem getChatListItem(JSONObject jsonObject) throws JSONException {
+        long pid = jsonObject.getLong("pid");
+        String senderToken = jsonObject.getString("sender_token");
+        String receiverToken = jsonObject.getString("receiver_token");
+        String msg = jsonObject.getString("msg");
+        String sender = jsonObject.getString("sender");
+        String imgUrl = jsonObject.getString("img_dir");
+
+        return new ChatListItem(pid, senderToken, receiverToken, msg, sender, imgUrl);
     }
 
     public void sendMsg(String senderToken, String receiverToken, String pid, String msg, String senderName) {
@@ -89,7 +108,7 @@ public class ChatViewModel extends AndroidViewModel {
     public void fetchChat(String senderToken, String receiverToken, String pid) {
         StringRequest request = new StringRequest(
                 Request.Method.POST,
-                FETCH_CHAT_URL,
+                FETCH_CHATS_URL,
                 response -> {
                     Log.d(TAG, "fetchChat response: " + response);
                     List<Chat> chList = new ArrayList<>();
@@ -98,7 +117,7 @@ public class ChatViewModel extends AndroidViewModel {
                         for (int i = 0; i < jsonArray.length(); i++) {
                             chList.add(getChat(jsonArray.getJSONObject(i)));
                         }
-                        chatList.setValue(chList);
+                        chats.setValue(chList);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -113,6 +132,38 @@ public class ChatViewModel extends AndroidViewModel {
                 params.put("sender_token", senderToken);
                 params.put("receiver_token", receiverToken);
                 params.put("pid", pid);
+                return params;
+            }
+        };
+
+        MySingleton.getInstance(getApplication().getApplicationContext()).enqueueRequest(request);
+    }
+
+    public void fetchChatListItems(String receiverToken) {
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                FETCH_CHAT_LIST_ITEMS_URL,
+                response -> {
+                    Log.d(TAG, "fetchChat response: " + response);
+                    List<ChatListItem> chList = new ArrayList<>();
+                    try {
+                        JSONArray jsonArray = new JSONArray(response);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            chList.add(getChatListItem(jsonArray.getJSONObject(i)));
+                        }
+                        chatListItems.setValue(chList);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                    Log.d(TAG, "sendMsg url error: " + error);
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("receiver_token", receiverToken);
                 return params;
             }
         };

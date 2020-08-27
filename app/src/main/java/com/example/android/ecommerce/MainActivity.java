@@ -18,10 +18,15 @@ import com.example.android.ecommerce.viewmodel.UserViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String ACTION_REFRESH_CHAT = "com.example.android.broadcast.ACTION_REFRESH_CHAT";
+    private static final String BROADCAST_PACKAGE = "com.example.android.broadcast";
+    public static final String ACTION_REFRESH_CHAT = BROADCAST_PACKAGE + ".ACTION_REFRESH_CHAT";
+    public static final String ACTION_REFRESH_CHAT_LIST = BROADCAST_PACKAGE + ".ACTION_REFRESH_CHAT_LIST";
 
     private ChatViewModel chatViewModel;
-    private RefreshChatBroadCastReceiver mRefreshChatBroadCastReceiver;
+
+    private LocalBroadcastManager localBroadcastManager;
+    private RefreshChatBroadcastReceiver mRefreshChatBroadCastReceiver;
+    private RefreshChatListBroadcastReceiver mRefreshChatListBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,24 +56,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        IntentFilter filter = new IntentFilter(ACTION_REFRESH_CHAT);
-        mRefreshChatBroadCastReceiver = new RefreshChatBroadCastReceiver();
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(mRefreshChatBroadCastReceiver, filter);
+        mRefreshChatBroadCastReceiver = new RefreshChatBroadcastReceiver();
+        mRefreshChatListBroadcastReceiver = new RefreshChatListBroadcastReceiver();
+
+        localBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
+        localBroadcastManager.registerReceiver(mRefreshChatBroadCastReceiver, new IntentFilter(ACTION_REFRESH_CHAT));
+        localBroadcastManager.registerReceiver(mRefreshChatListBroadcastReceiver, new IntentFilter(ACTION_REFRESH_CHAT_LIST));
     }
 
     @Override
     protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRefreshChatBroadCastReceiver);
+        localBroadcastManager.unregisterReceiver(mRefreshChatBroadCastReceiver);
+        localBroadcastManager.unregisterReceiver(mRefreshChatListBroadcastReceiver);
         super.onDestroy();
     }
 
-    private class RefreshChatBroadCastReceiver extends BroadcastReceiver {
+    private class RefreshChatBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String senderToken = intent.getStringExtra("senderToken");
             String receiverToken = intent.getStringExtra("receiverToken");
             String pid = intent.getStringExtra("pid");
             chatViewModel.fetchChat(senderToken, receiverToken, pid);
+            chatViewModel.fetchChatListItems(receiverToken);
+        }
+    }
+
+    private class RefreshChatListBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String token = intent.getStringExtra("token");
+            chatViewModel.fetchChatListItems(token);
         }
     }
 }

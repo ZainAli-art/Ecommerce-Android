@@ -19,20 +19,20 @@ import android.widget.Toast;
 import com.example.android.ecommerce.adapters.ChatRecyclerViewAdapter;
 import com.example.android.ecommerce.model.User;
 import com.example.android.ecommerce.viewmodel.ChatViewModel;
-import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
 public class ChatFragment extends Fragment implements View.OnClickListener {
-    public static final String SENDER_TOKEN_KEY = "from_id";
-    public static final String RECEIVER_TOKEN_KEY = "to_id";
+    public static final String SENDER_TOKEN_KEY = "sender_token";
+    public static final String RECEIVER_TOKEN_KEY = "receiver_token";
+    public static final String PRODUCT_ID_KEY = "product_id";
 
     private String senderToken;
     private String receiverToken;
+    private String pid;
 
     private EditText msgEditText;
     private UserViewModel userViewModel;
     private ChatViewModel chatViewModel;
-    private ProductViewModel productViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,6 +48,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         Bundle args = getArguments();
         senderToken = args.getString(SENDER_TOKEN_KEY);
         receiverToken = args.getString(RECEIVER_TOKEN_KEY);
+        pid = args.getString(PRODUCT_ID_KEY);
 
         RecyclerView chatRecyclerView = view.findViewById(R.id.chatRecyclerView);
         ChatRecyclerViewAdapter adapter = new ChatRecyclerViewAdapter(senderToken);
@@ -63,12 +64,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(ChatViewModel.class);
-        productViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(ProductViewModel.class);
 
-        chatViewModel.getChatList().observe(getViewLifecycleOwner(), chats -> {
+        chatViewModel.getChats().observe(getViewLifecycleOwner(), chats -> {
             adapter.setChatList(chats);
         });
     }
@@ -97,7 +94,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
 
         String msg = msgEditText.getText().toString();
         String senderName = user.getFullName();
-        String pid = String.valueOf(productViewModel.getDetailedProduct().getValue().getPid());
 
         chatViewModel.sendMsg(senderToken, receiverToken, pid, msg, senderName);
         msgEditText.setText("");
@@ -110,7 +106,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         intent.setPackage(requireActivity().getPackageName());
         intent.putExtra("senderToken", senderToken);
         intent.putExtra("receiverToken", receiverToken);
-        intent.putExtra("pid", String.valueOf(productViewModel.getDetailedProduct().getValue().getPid()));
+        intent.putExtra("pid", pid);
         LocalBroadcastManager.getInstance(requireActivity().getApplicationContext()).sendBroadcast(intent);
     }
 }

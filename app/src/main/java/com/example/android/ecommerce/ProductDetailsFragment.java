@@ -137,6 +137,7 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
                 Bundle args = new Bundle();
                 args.putString(ChatFragment.SENDER_TOKEN_KEY, senderToken);
                 args.putString(ChatFragment.RECEIVER_TOKEN_KEY, receiverToken);
+                args.putString(ChatFragment.PRODUCT_ID_KEY, pid);
 
                 navController.navigate(R.id.action_productDetailsFragment_to_chatFragment, args);
             }

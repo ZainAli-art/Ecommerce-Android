@@ -14,6 +14,10 @@
             android:icon="@drawable/ic_baseline_shopping_cart_24"
             android:title="Cart"/>
         <item
+            android:id="@+id/chatListFragment"
+            android:icon="@drawable/ic_baseline_chat_24"
+            android:title="chats"/>
+        <item
             android:id="@+id/profileFragment"
             android:icon="@drawable/ic_baseline_person_24"
             android:title="Account"/>
