@@ -1,1 +1,1 @@
-# Open Source Ecommerce Natvie Android App
+# Open Source Ecommerce Native Android App
