@@ -45,7 +45,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerVi
     @Override
     public ChatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View itemView = inflater.inflate(R.layout.chat_list_item, parent, false);
+        View itemView = inflater.inflate(R.layout.msg_list_item, parent, false);
         return new ChatViewHolder(itemView);
     }
 
@@ -74,13 +74,13 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerVi
     }
 
     public static class ChatViewHolder extends RecyclerView.ViewHolder {
-        private LinearLayout chatItemContainer;
+        private LinearLayout msgItemContainer;
         private CardView msgCard;
         private TextView msgText;
 
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
-            chatItemContainer = itemView.findViewById(R.id.chatItemContainer);
+            msgItemContainer = itemView.findViewById(R.id.msgItemContainer);
             msgCard = itemView.findViewById(R.id.msgCard);
             msgText = itemView.findViewById(R.id.msgText);
         }
@@ -90,7 +90,7 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerVi
         }
 
         public void setGravity(int gravity) {
-            chatItemContainer.setGravity(gravity);
+            msgItemContainer.setGravity(gravity);
         }
 
         public void setMsg(String msg) {

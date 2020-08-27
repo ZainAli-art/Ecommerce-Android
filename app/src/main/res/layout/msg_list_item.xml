@@ -2,7 +2,7 @@
 <LinearLayout mlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/chatItemContainer"
+    android:id="@+id/msgItemContainer"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:mlns="http://schemas.android.com/tools"

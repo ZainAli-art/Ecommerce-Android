@@ -24,7 +24,7 @@
         android:id="@+id/chatRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        tools:listitem="@layout/chat_list_item"
+        tools:listitem="@layout/msg_list_item"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/msgEditText"
         app:layout_constraintEnd_toEndOf="parent"
