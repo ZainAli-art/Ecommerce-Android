@@ -12,6 +12,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -158,13 +159,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String senderToken = remoteMessage.getData().get("sender_token");
         String receiverToken = remoteMessage.getData().get("receiver_token");
 
+            // --- send broadcast to refresh chat ---
+        Intent intent = new Intent(MainActivity.ACTION_REFRESH_CHAT);
+        intent.setPackage(getPackageName());
+        intent.putExtra("senderToken", senderToken);
+        intent.putExtra("receiverToken", receiverToken);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+
+            // --- send notification ---
         Bundle args = new Bundle();
         /* sender and receiver will be reversed in the chat */
         args.putString(ChatFragment.SENDER_TOKEN_KEY, receiverToken);
         args.putString(ChatFragment.RECEIVER_TOKEN_KEY, senderToken);
         args.putString("tag", "chat");
 
-        Intent intent = new Intent(this, MainActivity.class);
+        intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT, args);
 
