@@ -158,12 +158,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String body = remoteMessage.getNotification().getBody();
         String senderToken = remoteMessage.getData().get("sender_token");
         String receiverToken = remoteMessage.getData().get("receiver_token");
+        String pid = remoteMessage.getData().get("pid");
 
             // --- send broadcast to refresh chat ---
         Intent intent = new Intent(MainActivity.ACTION_REFRESH_CHAT);
         intent.setPackage(getPackageName());
         intent.putExtra("senderToken", senderToken);
         intent.putExtra("receiverToken", receiverToken);
+        intent.putExtra("pid", pid);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
             // --- send notification ---

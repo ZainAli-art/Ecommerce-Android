@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.example.android.ecommerce.adapters.ChatRecyclerViewAdapter;
 import com.example.android.ecommerce.model.User;
 import com.example.android.ecommerce.viewmodel.ChatViewModel;
+import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
 public class ChatFragment extends Fragment implements View.OnClickListener {
@@ -31,6 +32,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     private EditText msgEditText;
     private UserViewModel userViewModel;
     private ChatViewModel chatViewModel;
+    private ProductViewModel productViewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,6 +63,10 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(ChatViewModel.class);
+        productViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(ProductViewModel.class);
 
         chatViewModel.getChatList().observe(getViewLifecycleOwner(), chats -> {
             adapter.setChatList(chats);
@@ -91,8 +97,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
 
         String msg = msgEditText.getText().toString();
         String senderName = user.getFullName();
+        String pid = String.valueOf(productViewModel.getDetailedProduct().getValue().getPid());
 
-        chatViewModel.sendMsg(senderToken, receiverToken, msg, senderName);
+        chatViewModel.sendMsg(senderToken, receiverToken, pid, msg, senderName);
         msgEditText.setText("");
         refresh();
     }
@@ -103,6 +110,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         intent.setPackage(requireActivity().getPackageName());
         intent.putExtra("senderToken", senderToken);
         intent.putExtra("receiverToken", receiverToken);
+        intent.putExtra("pid", String.valueOf(productViewModel.getDetailedProduct().getValue().getPid()));
         LocalBroadcastManager.getInstance(requireActivity().getApplicationContext()).sendBroadcast(intent);
     }
 }

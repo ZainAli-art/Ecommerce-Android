@@ -47,13 +47,14 @@ public class ChatViewModel extends AndroidViewModel {
     private Chat getChat(JSONObject jsonObject) throws JSONException {
         String senderToken = jsonObject.getString("sender_token");
         String receiverToken = jsonObject.getString("receiver_token");
+        long pid = jsonObject.getLong("pid");
         String msg = jsonObject.getString("msg");
         String time = jsonObject.getString("upload_time");
 
-        return new Chat(senderToken, receiverToken, msg, time);
+        return new Chat(senderToken, receiverToken, pid, msg, time);
     }
 
-    public void sendMsg(String senderToken, String receiverToken, String msg, String senderName) {
+    public void sendMsg(String senderToken, String receiverToken, String pid, String msg, String senderName) {
         StringRequest request = new StringRequest(
                 Request.Method.POST,
                 SEND_MSG_URL,
@@ -69,6 +70,7 @@ public class ChatViewModel extends AndroidViewModel {
                 Map<String, String> params = new HashMap<>();
                 params.put("sender_token", senderToken);
                 params.put("receiver_token", receiverToken);
+                params.put("pid", pid);
                 params.put("msg", msg);
                 params.put("sender_name", senderName);
                 return params;
@@ -84,7 +86,7 @@ public class ChatViewModel extends AndroidViewModel {
         MySingleton.getInstance(getApplication().getApplicationContext()).enqueueRequest(request);
     }
 
-    public void fetchChat(String senderToken, String receiverToken) {
+    public void fetchChat(String senderToken, String receiverToken, String pid) {
         StringRequest request = new StringRequest(
                 Request.Method.POST,
                 FETCH_CHAT_URL,
@@ -110,6 +112,7 @@ public class ChatViewModel extends AndroidViewModel {
                 Map<String, String> params = new HashMap<>();
                 params.put("sender_token", senderToken);
                 params.put("receiver_token", receiverToken);
+                params.put("pid", pid);
                 return params;
             }
         };
