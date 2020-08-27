@@ -129,7 +129,7 @@ public class UserViewModel extends AndroidViewModel {
                     String email = object.getString("email");
                     Uri imgUrl = Uri.parse("https://graph.facebook.com/" + uid + "/picture?type=normal");
 
-                    setUser(new User(uid, name, email, imgUrl));
+                    setUser(new User(uid, email, name, imgUrl));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 } catch (NullPointerException e) {
