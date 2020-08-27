@@ -12,10 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.android.ecommerce.adapters.ChatRecyclerViewAdapter;
-import com.example.android.ecommerce.model.User;
 import com.example.android.ecommerce.viewmodel.ChatViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
@@ -29,7 +27,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     private String pid;
 
     private EditText msgEditText;
-    private UserViewModel userViewModel;
     private ChatViewModel chatViewModel;
 
     @Override
@@ -54,10 +51,6 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         msgEditText = view.findViewById(R.id.msgEditText);
         view.findViewById(R.id.sendMsgBtn).setOnClickListener(this);
 
-        userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(UserViewModel.class);
         chatViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -84,16 +77,8 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     }
 
     public void sendMsg() {
-        User user = userViewModel.getUser().getValue();
-        if (user == null) {
-            Toast.makeText(getContext(), "You are not logged in yet.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         String msg = msgEditText.getText().toString();
-        String senderName = user.getFullName();
-
-        chatViewModel.sendMsg(senderToken, receiverToken, pid, msg, senderName);
+        chatViewModel.sendMsg(senderToken, receiverToken, pid, msg);
         msgEditText.setText("");
         refresh();
     }

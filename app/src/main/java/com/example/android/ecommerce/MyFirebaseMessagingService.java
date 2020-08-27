@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.navigation.NavDeepLinkBuilder;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -160,7 +161,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String receiverToken = remoteMessage.getData().get("receiver_token");
         String pid = remoteMessage.getData().get("pid");
 
-            // --- send broadcast to refresh chat ---
+            // --- trigger broadcast to refresh chat ---
         Intent intent = new Intent(MainActivity.ACTION_REFRESH_CHAT);
         intent.setPackage(getPackageName());
         intent.putExtra("senderToken", senderToken);
@@ -173,12 +174,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         /* sender and receiver will be reversed in the chat */
         args.putString(ChatFragment.SENDER_TOKEN_KEY, receiverToken);
         args.putString(ChatFragment.RECEIVER_TOKEN_KEY, senderToken);
-        args.putString("tag", "chat");
+        args.putString(ChatFragment.PRODUCT_ID_KEY, pid);
 
-        intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT, args);
+//        intent = new Intent(this, MainActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT, args);
 
+            // create pending intent for the notification
+        PendingIntent pendingIntent = new NavDeepLinkBuilder(this)
+                .setComponentName(MainActivity.class)
+                .setGraph(R.navigation.nav_graph)
+                .setDestination(R.id.chatFragment)
+                .setArguments(args)
+                .createPendingIntent();
+
+            // build and trigger notification
         Notification notification = new NotificationCompat.Builder(this, getString(R.string.trans_channel_id))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)    // required
                 .setContentTitle(title)

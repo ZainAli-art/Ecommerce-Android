@@ -73,7 +73,7 @@ public class ChatViewModel extends AndroidViewModel {
         return new ChatListItem(pid, senderToken, receiverToken, msg, sender, imgUrl);
     }
 
-    public void sendMsg(String senderToken, String receiverToken, String pid, String msg, String senderName) {
+    public void sendMsg(String senderToken, String receiverToken, String pid, String msg) {
         StringRequest request = new StringRequest(
                 Request.Method.POST,
                 SEND_MSG_URL,
@@ -91,7 +91,6 @@ public class ChatViewModel extends AndroidViewModel {
                 params.put("receiver_token", receiverToken);
                 params.put("pid", pid);
                 params.put("msg", msg);
-                params.put("sender_name", senderName);
                 return params;
             }
         };
