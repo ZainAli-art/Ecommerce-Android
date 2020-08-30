@@ -15,9 +15,9 @@ import com.example.android.ecommerce.model.Product;
 import com.example.android.ecommerce.model.ProductDetails;
 import com.example.android.ecommerce.model.User;
 import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.Task;
 
 import java.util.List;
@@ -69,16 +69,16 @@ public class ECommerceRepository {
         return eCommerceNetwork.getCatIdByName(categoryName);
     }
 
-    public GoogleSignInOptions getGoogleSignOptions() {
-        return eCommerceNetwork.getGoogleSignOptions();
-    }
-
     public GoogleSignInClient getGoogleSignInClient() {
         return eCommerceNetwork.getGoogleSignInClient();
     }
 
     public void signInLastSignedInUser() {
         eCommerceNetwork.signInLastSignedInUser();
+    }
+
+    public CallbackManager getFacebookCallbackManager()  {
+        return eCommerceNetwork.getFacebookCallbackManager();
     }
 
     public void loginFromFacebookAccessToken(AccessToken accessToken) {
@@ -91,14 +91,6 @@ public class ECommerceRepository {
 
     public void signOut(Activity activity) {
         eCommerceNetwork.signOut(activity);
-    }
-
-    public void registerUserToken(String uid, String token) {
-        eCommerceNetwork.registerUserToken(uid, token);
-    }
-
-    public void unregisterUserToken(String token) {
-        eCommerceNetwork.unregisterUserToken(token);
     }
 
     // ------ category -------

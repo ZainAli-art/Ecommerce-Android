@@ -201,7 +201,7 @@ public class ECommerceNetwork {
 
         // --------- User ---------
 
-    public GoogleSignInOptions getGoogleSignOptions() {
+    private GoogleSignInOptions getGoogleSignOptions() {
         if (gso == null) {
             gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestEmail()
@@ -217,7 +217,7 @@ public class ECommerceNetwork {
         return mGoogleSignInClient;
     }
 
-    private CallbackManager getFacebookCallbackManager() {
+    public CallbackManager getFacebookCallbackManager() {
         if (facebookCallbackManager == null) {
             facebookCallbackManager = CallbackManager.Factory.create();
         }
@@ -315,7 +315,7 @@ public class ECommerceNetwork {
         enqueueRequest(request);
     }
 
-    public void registerUserToken(String uid, String token) {
+    private void registerUserToken(String uid, String token) {
         StringRequest request = new StringRequest(
                 Request.Method.POST,
                 REGISTER_USER_TOKEN_URL,
@@ -336,7 +336,7 @@ public class ECommerceNetwork {
         enqueueRequest(request);
     }
 
-    public void unregisterUserToken(String token) {
+    private void unregisterUserToken(String token) {
         StringRequest request = new StringRequest(
                 Request.Method.POST,
                 UNREGISTER_USER_TOKEN_URL,
@@ -356,7 +356,7 @@ public class ECommerceNetwork {
         enqueueRequest(request);
     }
 
-    // ------ category -------
+        // ------ category -------
 
     public long getCatIdByName(String categoryName) {
         Long id = catMap.get(categoryName);
@@ -393,7 +393,7 @@ public class ECommerceNetwork {
         enqueueRequest(request);
     }
 
-    // ------ product -------
+        // ------ product -------
 
     private Product getProduct(JSONObject jsonObject) throws JSONException {
         long pid = jsonObject.getLong("pid");
@@ -532,7 +532,7 @@ public class ECommerceNetwork {
         enqueueRequest(request);
     }
 
-    // ------ cart -------
+        // ------ cart -------
 
     private OrderedProduct getOrderedProduct(JSONObject jsonObject) throws JSONException {
         long oid = jsonObject.getLong("oid");
@@ -652,7 +652,7 @@ public class ECommerceNetwork {
         enqueueRequest(request);
     }
 
-    // ------ chat -------
+        // ------ chat -------
 
     private Chat getChat(JSONObject jsonObject) throws JSONException {
         String senderToken = jsonObject.getString("sender_token");
