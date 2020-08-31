@@ -17,7 +17,7 @@ public class ChatViewModel extends AndroidViewModel {
 
     public ChatViewModel(@NonNull Application application) {
         super(application);
-        repo = new ECommerceRepository(application);
+        repo = ECommerceRepository.getInstance(application);
     }
 
     public LiveData<List<Chat>> getChats(String senderToken, String receiverToken, String pid) {

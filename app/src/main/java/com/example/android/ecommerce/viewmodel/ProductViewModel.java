@@ -17,7 +17,7 @@ public class ProductViewModel extends AndroidViewModel {
 
     public ProductViewModel(@NonNull Application application) {
         super(application);
-        repo = new ECommerceRepository(application);
+        repo = ECommerceRepository.getInstance(application);
     }
 
     public LiveData<List<Product>> getProducts(String catId) {

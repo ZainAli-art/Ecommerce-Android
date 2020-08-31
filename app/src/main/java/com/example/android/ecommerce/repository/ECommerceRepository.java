@@ -23,10 +23,23 @@ import com.google.android.gms.tasks.Task;
 import java.util.List;
 
 public class ECommerceRepository {
+    static volatile ECommerceRepository INSTANCE;
+
     private ECommerceNetwork eCommerceNetwork;
 
-    public ECommerceRepository(Application application) {
-        eCommerceNetwork = ECommerceNetwork.getNetwork(application.getApplicationContext());
+    public static ECommerceRepository getInstance(Application application) {
+        if (INSTANCE == null) {
+            synchronized (ECommerceRepository.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new ECommerceRepository(application);
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    private ECommerceRepository(Application application) {
+        eCommerceNetwork = new ECommerceNetwork(application.getApplicationContext());
     }
 
     public LiveData<User> getUser() {

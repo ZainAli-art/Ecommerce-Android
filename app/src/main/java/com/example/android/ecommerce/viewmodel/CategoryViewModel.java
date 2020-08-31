@@ -19,7 +19,7 @@ public class CategoryViewModel extends AndroidViewModel {
 
     public CategoryViewModel(@NonNull Application application) {
         super(application);
-        repo = new ECommerceRepository(application);
+        repo = ECommerceRepository.getInstance(application);
         catMap = new HashMap<>();
     }
 

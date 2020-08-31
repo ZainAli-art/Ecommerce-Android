@@ -20,7 +20,7 @@ public class UserViewModel extends AndroidViewModel {
 
     public UserViewModel(@NonNull Application application) {
         super(application);
-        repo = new ECommerceRepository(application);
+        repo = ECommerceRepository.getInstance(application);
     }
 
     public LiveData<User> getUser() {

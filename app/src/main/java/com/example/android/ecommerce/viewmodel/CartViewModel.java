@@ -16,7 +16,7 @@ public class CartViewModel extends AndroidViewModel {
 
     public CartViewModel(@NonNull Application application) {
         super(application);
-        repo = new ECommerceRepository(application);
+        repo = ECommerceRepository.getInstance(application);
     }
 
     public LiveData<List<OrderedProduct>> getCartProducts(String uid) {
