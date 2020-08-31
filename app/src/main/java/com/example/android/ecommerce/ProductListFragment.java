@@ -22,7 +22,6 @@ import java.util.List;
 public class ProductListFragment extends Fragment implements ProductRecyclerViewAdapter.ProductItemListener {
     private NavController navController;
     private ProductRecyclerViewAdapter adapter;
-    private List<Product> products;
 
     public ProductListFragment() {
         // Required empty public constructor
@@ -52,15 +51,14 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
 
         // observers
         productViewModel.getProducts(catId).observe(getViewLifecycleOwner(), products -> {
-            this.products = products;
-            adapter.setProducts(products);
+            adapter.setItems(products);
         });
     }
 
     @Override
     public void onClickProduct(int pos) {
         Bundle args = new Bundle();
-        String pid = String.valueOf(products.get(pos).getPid());
+        String pid = String.valueOf(adapter.getItem(pos).getPid());
         args.putString(ProductDetailsFragment.PRODUCT_ID, pid);
 
         navController.navigate(R.id.action_productListFragment_to_productDetailsFragment, args);

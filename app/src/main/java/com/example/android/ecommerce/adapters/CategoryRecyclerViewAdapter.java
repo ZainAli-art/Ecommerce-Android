@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.R;
+import com.example.android.ecommerce.interfaces.ECommerceRecyclerViewAdaptable;
 import com.example.android.ecommerce.model.Category;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRecyclerViewAdapter.CatViewHolder> {
+public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRecyclerViewAdapter.CatViewHolder>
+        implements ECommerceRecyclerViewAdaptable<Category> {
     private List<Category> categories;
     private int viewType;
     private CategoryItemListener listener;
@@ -29,18 +31,6 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
     public CategoryRecyclerViewAdapter(int viewType, CategoryItemListener listener) {
         this.viewType = viewType;
         this.listener = listener;
-    }
-
-    public List<Category> getCategories() {
-        if (categories == null) {
-            categories = new ArrayList<>();
-        }
-        return categories;
-    }
-
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -66,7 +56,21 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
 
     @Override
     public int getItemCount() {
-        return getCategories().size();
+        return getItems().size();
+    }
+
+    @Override
+    public List<Category> getItems() {
+        if (categories == null) {
+            categories = new ArrayList<>();
+        }
+        return categories;
+    }
+
+    @Override
+    public void setItems(List<Category> dataSet) {
+        this.categories = dataSet;
+        notifyDataSetChanged();
     }
 
     @Override

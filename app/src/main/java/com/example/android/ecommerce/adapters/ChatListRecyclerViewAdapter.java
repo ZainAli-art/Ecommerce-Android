@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.R;
+import com.example.android.ecommerce.interfaces.ECommerceRecyclerViewAdaptable;
 import com.example.android.ecommerce.model.ChatListItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRecyclerViewAdapter.CLViewHolder> {
+public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRecyclerViewAdapter.CLViewHolder>
+        implements ECommerceRecyclerViewAdaptable<ChatListItem> {
     private List<ChatListItem> chatListItems;
     private ChatListItemListener listener;
 
@@ -27,18 +29,6 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
 
     public ChatListRecyclerViewAdapter(ChatListItemListener listener) {
         this.listener = listener;
-    }
-
-    public List<ChatListItem> getChatListItems() {
-        if (chatListItems == null) {
-            chatListItems = new ArrayList<>();
-        }
-        return chatListItems;
-    }
-
-    public void setChatListItems(List<ChatListItem> chatListItems) {
-        this.chatListItems = chatListItems;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -59,11 +49,24 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
 
     @Override
     public int getItemCount() {
-        return getChatListItems().size();
+        return getItems().size();
+    }
+
+    @Override
+    public List<ChatListItem> getItems() {
+        if (chatListItems == null) {
+            chatListItems = new ArrayList<>();
+        }
+        return chatListItems;
+    }
+
+    @Override
+    public void setItems(List<ChatListItem> dataSet) {
+        this.chatListItems = dataSet;
+        notifyDataSetChanged();
     }
 
     public static class CLViewHolder extends RecyclerView.ViewHolder {
-        private ChatListItemListener listener;
         private Context mContext;
         private ImageView senderImg;
         private TextView senderName;
@@ -71,7 +74,6 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
 
         public CLViewHolder(@NonNull View itemView, ChatListItemListener listener, Context context) {
             super(itemView);
-            this.listener = listener;
             this.mContext = context;
             senderImg = itemView.findViewById(R.id.senderImg);
             senderName = itemView.findViewById(R.id.senderName);

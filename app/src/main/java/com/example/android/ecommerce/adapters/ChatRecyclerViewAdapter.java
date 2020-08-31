@@ -14,12 +14,14 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.ecommerce.R;
+import com.example.android.ecommerce.interfaces.ECommerceRecyclerViewAdaptable;
 import com.example.android.ecommerce.model.Chat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerViewAdapter.ChatViewHolder> {
+public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerViewAdapter.ChatViewHolder>
+        implements ECommerceRecyclerViewAdaptable<Chat> {
     private static final String TAG = "ChatRecyclerViewAdapter";
 
     private List<Chat> chatList;
@@ -27,18 +29,6 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerVi
 
     public ChatRecyclerViewAdapter(String senderToken) {
         this.senderToken = senderToken;
-    }
-
-    public List<Chat> getChatList() {
-        if (chatList == null) {
-            chatList = new ArrayList<>();
-        }
-        return chatList;
-    }
-
-    public void setChatList(List<Chat> chatList) {
-        this.chatList = chatList;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -70,7 +60,21 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerVi
 
     @Override
     public int getItemCount() {
-        return getChatList().size();
+        return getItems().size();
+    }
+
+    @Override
+    public List<Chat> getItems() {
+        if (chatList == null) {
+            chatList = new ArrayList<>();
+        }
+        return chatList;
+    }
+
+    @Override
+    public void setItems(List<Chat> dataSet) {
+        this.chatList = dataSet;
+        notifyDataSetChanged();
     }
 
     public static class ChatViewHolder extends RecyclerView.ViewHolder {

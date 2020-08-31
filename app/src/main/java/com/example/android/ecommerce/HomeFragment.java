@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.android.ecommerce.adapters.CategoryRecyclerViewAdapter;
 import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
@@ -27,19 +26,17 @@ import com.example.android.ecommerce.viewmodel.CategoryViewModel;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
-import java.util.List;
-
 public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapter.CategoryItemListener,
         ProductRecyclerViewAdapter.ProductItemListener {
     public static final int REQUEST_INTERNET = 1;
     public static final String SELECTED_CAT_ID = "com.example.android.ecommerce.HomeFragment.cat_id";
 
-    private List<Category> categories;
-    private List<Product> recentProducts;
     private NavController navController;
     private CategoryViewModel categoryViewModel;
     private UserViewModel userViewModel;
     private ProductViewModel productViewModel;
+    private ProductRecyclerViewAdapter recentProductsAdapter;
+    private CategoryRecyclerViewAdapter categoryAdapter;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -57,11 +54,11 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         super.onViewCreated(view, savedInstanceState);
 
         RecyclerView categoryRecyclerView = view.findViewById(R.id.categoryRecyclerView);
-        CategoryRecyclerViewAdapter categoryAdapter = new CategoryRecyclerViewAdapter(Category.HORIZONTAL_TYPE, this);
+        categoryAdapter = new CategoryRecyclerViewAdapter(Category.HORIZONTAL_TYPE, this);
         categoryRecyclerView.setAdapter(categoryAdapter);
 
         RecyclerView recentProductsRecyclerView = view.findViewById(R.id.recentProductsRecyclerView);
-        ProductRecyclerViewAdapter recentProductsAdapter = new ProductRecyclerViewAdapter(Product.HORIZONTAL_TYPE, this);
+        recentProductsAdapter = new ProductRecyclerViewAdapter(Product.HORIZONTAL_TYPE, this);
         recentProductsRecyclerView.setAdapter(recentProductsAdapter);
 
         navController = NavHostFragment.findNavController(this);
@@ -88,14 +85,14 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
             }
         });
         categoryViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
-            if (!internetPermissionGranted()) return;
-            this.categories = categories;
-            categoryAdapter.setCategories(categories);
+            if (internetPermissionGranted()) {
+                categoryAdapter.setItems(categories);
+            }
         });
         productViewModel.getRecentProducts().observe(getViewLifecycleOwner(), recentProducts -> {
-            if (!internetPermissionGranted()) return;
-            this.recentProducts = recentProducts;
-            recentProductsAdapter.setProducts(recentProducts);
+            if (internetPermissionGranted()) {
+                recentProductsAdapter.setItems(recentProducts);
+            }
         });
 
         requestPermissions(new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET);
@@ -103,7 +100,7 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
 
     @Override
     public void onClickCategory(int pos) {
-        String catId = String.valueOf(categories.get(pos).getId());
+        String catId = String.valueOf(categoryAdapter.getItem(pos).getId());
         Bundle args = new Bundle();
         args.putString(SELECTED_CAT_ID, catId);
 
@@ -113,7 +110,7 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
     @Override
     public void onClickProduct(int pos) {
         Bundle args = new Bundle();
-        String pid = String.valueOf(recentProducts.get(pos).getPid());
+        String pid = String.valueOf(recentProductsAdapter.getItem(pos).getPid());
         args.putString(ProductDetailsFragment.PRODUCT_ID, pid);
 
         navController.navigate(R.id.action_homeFragment_to_productDetailsFragment, args);

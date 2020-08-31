@@ -12,32 +12,25 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.R;
+import com.example.android.ecommerce.interfaces.ECommerceRecyclerViewAdaptable;
 import com.example.android.ecommerce.model.OrderedProduct;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderedProductRecyclerViewAdapter extends RecyclerView.Adapter<OrderedProductRecyclerViewAdapter.OPViewHolder> {
+public class OrderedProductRecyclerViewAdapter extends RecyclerView.Adapter<OrderedProductRecyclerViewAdapter.OPViewHolder>
+        implements ECommerceRecyclerViewAdaptable<OrderedProduct> {
     List<OrderedProduct> orderedProducts;
     private OrderedProductItemListener listener;
 
     public interface OrderedProductItemListener {
         void onClickOrderedProduct(int pos);
+
         void onClickDeleteOrderedProduct(int pos);
     }
 
     public OrderedProductRecyclerViewAdapter(OrderedProductItemListener listener) {
         this.listener = listener;
-    }
-
-    public List<OrderedProduct> getOrderedProducts() {
-        if (orderedProducts == null) orderedProducts = new ArrayList<>();
-        return orderedProducts;
-    }
-
-    public void setOrderedProducts(List<OrderedProduct> orderedProducts) {
-        this.orderedProducts = orderedProducts;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -57,7 +50,21 @@ public class OrderedProductRecyclerViewAdapter extends RecyclerView.Adapter<Orde
 
     @Override
     public int getItemCount() {
-        return getOrderedProducts().size();
+        return getItems().size();
+    }
+
+    @Override
+    public List<OrderedProduct> getItems() {
+        if (orderedProducts == null) {
+            orderedProducts = new ArrayList<>();
+        }
+        return orderedProducts;
+    }
+
+    @Override
+    public void setItems(List<OrderedProduct> dataSet) {
+        this.orderedProducts = dataSet;
+        notifyDataSetChanged();
     }
 
     public static class OPViewHolder extends RecyclerView.ViewHolder {

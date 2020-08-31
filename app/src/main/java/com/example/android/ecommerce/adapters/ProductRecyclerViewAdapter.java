@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.R;
+import com.example.android.ecommerce.interfaces.ECommerceRecyclerViewAdaptable;
 import com.example.android.ecommerce.model.Product;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecyclerViewAdapter.PViewHolder> {
+public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecyclerViewAdapter.PViewHolder>
+        implements ECommerceRecyclerViewAdaptable<Product> {
     private List<Product> products;
     private int viewType;
     private ProductItemListener listener;
@@ -49,18 +51,6 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
         return new PViewHolder(itemView, listener, parent.getContext());
     }
 
-    public List<Product> getProducts() {
-        if (products == null) {
-            products = new ArrayList<>();
-        }
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-        notifyDataSetChanged();
-    }
-
     @Override
     public void onBindViewHolder(@NonNull PViewHolder holder, int position) {
         Product product = products.get(position);
@@ -70,7 +60,21 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
 
     @Override
     public int getItemCount() {
-        return getProducts().size();
+        return getItems().size();
+    }
+
+    @Override
+    public List<Product> getItems() {
+        if (products == null) {
+            products = new ArrayList<>();
+        }
+        return products;
+    }
+
+    @Override
+    public void setItems(List<Product> dataSet) {
+        this.products = dataSet;
+        notifyDataSetChanged();
     }
 
     @Override

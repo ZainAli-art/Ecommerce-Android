@@ -51,9 +51,7 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
         ).get(UserViewModel.class);
         uid = userViewModel.getUser().getValue().getUid();
 
-        cartViewModel.getCartProducts(uid).observe(getViewLifecycleOwner(), cartProducts -> {
-            adapter.setOrderedProducts(cartProducts);
-        });
+        cartViewModel.getCartProducts(uid).observe(getViewLifecycleOwner(), adapter::setItems);
     }
 
     @Override
@@ -64,7 +62,7 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
     @Override
     public void onClickOrderedProduct(int pos) {
         Bundle args = new Bundle();
-        String oid = String.valueOf(cartViewModel.getCartProducts(uid).getValue().get(pos).getOid());
+        String oid = String.valueOf(adapter.getItems().get(pos).getOid());
         args.putString(OrderDetailsFragment.ORDER_DETAILS_ID, oid);
         args.putString(OrderDetailsFragment.USER_ID, uid);
 
@@ -73,9 +71,9 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
 
     @Override
     public void onClickDeleteOrderedProduct(int pos) {
-        String oid = String.valueOf(adapter.getOrderedProducts().get(pos).getOid());
-        cartViewModel.deleteOrder(oid);
-        adapter.getOrderedProducts().remove(pos);
+        String oid = String.valueOf(adapter.getItems().get(pos).getOid());
+        adapter.getItems().remove(pos);
         adapter.notifyItemRemoved(pos);
+        cartViewModel.deleteOrder(oid);
     }
 }

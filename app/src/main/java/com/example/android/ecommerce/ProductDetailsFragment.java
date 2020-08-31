@@ -45,6 +45,7 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
 
     private String uid;
     private String pid;
+    private String sellerToken;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -90,6 +91,7 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
         productViewModel.getProductDetails(pid).observe(getViewLifecycleOwner(), productDetails -> {
             if (productDetails != null) {
                 updateUi(productDetails);
+                sellerToken = productDetails.getSellerToken();
             }
         });
     }
@@ -126,11 +128,9 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
         FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
             @Override
             public void onSuccess(InstanceIdResult instanceIdResult) {
-                String senderToken = instanceIdResult.getToken();
-                String receiverToken = productViewModel.getProductDetails(pid).getValue().getSellerToken();
                 Bundle args = new Bundle();
-                args.putString(ChatFragment.SENDER_TOKEN_KEY, senderToken);
-                args.putString(ChatFragment.RECEIVER_TOKEN_KEY, receiverToken);
+                args.putString(ChatFragment.SENDER_TOKEN_KEY, instanceIdResult.getToken());
+                args.putString(ChatFragment.RECEIVER_TOKEN_KEY, sellerToken);
                 args.putString(ChatFragment.PRODUCT_ID_KEY, pid);
 
                 navController.navigate(R.id.action_productDetailsFragment_to_chatFragment, args);

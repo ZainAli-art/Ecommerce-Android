@@ -55,9 +55,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(ChatViewModel.class);
 
-        chatViewModel.getChats(senderToken, receiverToken, pid).observe(getViewLifecycleOwner(), chats -> {
-            adapter.setChatList(chats);
-        });
+        chatViewModel.getChats(senderToken, receiverToken, pid).observe(getViewLifecycleOwner(), adapter::setItems);
     }
 
     @Override

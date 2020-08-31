@@ -17,14 +17,13 @@ import android.view.ViewGroup;
 import com.example.android.ecommerce.adapters.ChatListRecyclerViewAdapter;
 import com.example.android.ecommerce.model.ChatListItem;
 import com.example.android.ecommerce.viewmodel.ChatViewModel;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 
 public class ChatListFragment extends Fragment implements ChatListRecyclerViewAdapter.ChatListItemListener {
     private NavController navController;
     private RecyclerView chatListRecyclerView;
     private ChatViewModel chatViewModel;
+    private ChatListRecyclerViewAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,7 +39,7 @@ public class ChatListFragment extends Fragment implements ChatListRecyclerViewAd
         navController = NavHostFragment.findNavController(this);
 
         chatListRecyclerView = view.findViewById(R.id.chatListRecyclerView);
-        ChatListRecyclerViewAdapter adapter = new ChatListRecyclerViewAdapter(this);
+        adapter = new ChatListRecyclerViewAdapter(this);
         chatListRecyclerView.setAdapter(adapter);
 
         chatViewModel = new ViewModelProvider(
@@ -50,26 +49,23 @@ public class ChatListFragment extends Fragment implements ChatListRecyclerViewAd
 
         FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(instanceIdResult -> {
             String token = instanceIdResult.getToken();
-            chatViewModel.getChatListItems(token).observe(getViewLifecycleOwner(), adapter::setChatListItems);
+            chatViewModel.getChatListItems(token).observe(getViewLifecycleOwner(), adapter::setItems);
         });
     }
 
     @Override
     public void onClickChatListItem(int pos) {
-        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(instanceIdResult -> {
-            String token = instanceIdResult.getToken();
-            ChatListItem chatListItem = chatViewModel.getChatListItems(token).getValue().get(pos);
-            String senderToken = chatListItem.getSenderToken();
-            String receiverToken = chatListItem.getReceiverToken();
-            String pid = String.valueOf(chatListItem.getPid());
+        ChatListItem chatListItem = adapter.getItem(pos);
+        String senderToken = chatListItem.getSenderToken();
+        String receiverToken = chatListItem.getReceiverToken();
+        String pid = String.valueOf(chatListItem.getPid());
 
-            Bundle args = new Bundle();
-            /* sender and receiver will be reversed in the chat */
-            args.putString(ChatFragment.SENDER_TOKEN_KEY, receiverToken);
-            args.putString(ChatFragment.RECEIVER_TOKEN_KEY, senderToken);
-            args.putString(ChatFragment.PRODUCT_ID_KEY, pid);
+        Bundle args = new Bundle();
+        /* sender and receiver will be reversed in the chat */
+        args.putString(ChatFragment.SENDER_TOKEN_KEY, receiverToken);
+        args.putString(ChatFragment.RECEIVER_TOKEN_KEY, senderToken);
+        args.putString(ChatFragment.PRODUCT_ID_KEY, pid);
 
-            navController.navigate(R.id.action_chatListFragment_to_chatFragment, args);
-        });
+        navController.navigate(R.id.action_chatListFragment_to_chatFragment, args);
     }
 }
