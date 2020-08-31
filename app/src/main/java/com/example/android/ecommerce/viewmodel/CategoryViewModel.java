@@ -9,25 +9,31 @@ import androidx.lifecycle.LiveData;
 import com.example.android.ecommerce.model.Category;
 import com.example.android.ecommerce.repository.ECommerceRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CategoryViewModel extends AndroidViewModel {
     private ECommerceRepository repo;
+    private Map<String, Long> catMap;
 
     public CategoryViewModel(@NonNull Application application) {
         super(application);
         repo = new ECommerceRepository(application);
+        catMap = new HashMap<>();
     }
 
     public LiveData<List<Category>> getCategories() {
+        List<Category> categories = repo.getCategories().getValue();
+        if (categories != null) {
+            catMap = new HashMap<>();
+            for (Category c : categories)
+                catMap.put(c.getName(), c.getId());
+        }
         return repo.getCategories();
     }
 
-    public long getCatIdByName(String categoryName) {
-        return repo.getCatIdByName(categoryName);
-    }
-
-    public void refreshCategories() {
-        repo.refreshCategories();
+    public Long getCatIdByName(String name) {
+        return catMap.get(name);
     }
 }

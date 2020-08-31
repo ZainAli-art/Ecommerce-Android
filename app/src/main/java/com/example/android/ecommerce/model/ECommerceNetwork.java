@@ -89,16 +89,6 @@ public class ECommerceNetwork {
     private Context mContext;
 
     private MutableLiveData<User> mUser;
-    private MutableLiveData<List<Category>> categories;
-    private MutableLiveData<List<Product>> products;
-    private MutableLiveData<List<Product>> recentProducts;
-    private MutableLiveData<ProductDetails> detailedProduct;
-    private MutableLiveData<List<OrderedProduct>> cartProducts;
-    private MutableLiveData<OrderDetails> detailedOrder;
-    private MutableLiveData<List<Chat>> chats;
-    private MutableLiveData<List<ChatListItem>> chatListItems;
-
-    private Map<String, Long> catMap;
 
     public static ECommerceNetwork getNetwork(final Context context) {
         if (INSTANCE == null) {
@@ -121,95 +111,264 @@ public class ECommerceNetwork {
                     loginFromFacebookAccessToken(currentAccessToken);
             }
         };
-        categories = new MutableLiveData<>();
-        catMap = new HashMap<>();
-        products = new MutableLiveData<>();
-        recentProducts = new MutableLiveData<>();
-        detailedProduct = new MutableLiveData<>();
-        cartProducts = new MutableLiveData<>();
-        detailedOrder = new MutableLiveData<>();
-        chats = new MutableLiveData<>();
-        chatListItems = new MutableLiveData<>();
     }
-    /* Live Data Getters */
+    /* Live Data */
     public LiveData<User> getUser() {
         return mUser;
     }
 
     public LiveData<List<Category>> getCategories() {
-        if (categories == null) {
-            setCategories(new ArrayList<>());
-        }
-        return categories;
+        MutableLiveData<List<Category>> data = new MutableLiveData<>();
+
+        JsonArrayRequest request = new JsonArrayRequest(
+                CAT_JSON_URL,
+                response -> {
+                    List<Category> categories = new ArrayList<>();
+                    try {
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject jsonObject = response.getJSONObject(i);
+                            int catId = jsonObject.getInt("cat_id");
+                            String catName = jsonObject.getString("cat_name");
+                            String imgUrl = HOST_URL + jsonObject.getString("img_dir");
+
+                            categories.add(new Category(catId, catName, imgUrl));
+                        }
+                        data.setValue(categories);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                    Toast.makeText(mContext, "Json Response Error", Toast.LENGTH_SHORT).show();
+                }
+        );
+        enqueueRequest(request);
+
+        return data;
     }
 
-    public LiveData<List<Product>> getProducts() {
-        return products;
+    public LiveData<List<Product>> getProducts(String catId) {
+        MutableLiveData<List<Product>> data = new MutableLiveData<>();
+
+        Uri.Builder builder = Uri.parse(FETCH_PRODUCTS_BY_CAT_ID_URL).buildUpon();
+        builder.appendQueryParameter("cat_id", catId);
+
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                builder.toString(),
+                null,
+                response -> {
+                    try {
+                        List<Product> pList = new ArrayList<>();
+                        for (int i = 0; i < response.length(); i++) {
+                            pList.add(getProduct(response.getJSONObject(i)));
+                        }
+                        data.setValue(pList);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                }
+        );
+
+        enqueueRequest(request);
+
+        return data;
     }
 
     public LiveData<List<Product>> getRecentProducts() {
-        return recentProducts;
+        MutableLiveData<List<Product>> data = new MutableLiveData<>();
+
+        String recentProductsUrl = Uri.parse(FETCH_RECENT_PRODUCTS_URL)
+                .buildUpon()
+                .appendQueryParameter("limit", "5")
+                .build()
+                .toString();
+
+        JsonArrayRequest request = new JsonArrayRequest(
+                recentProductsUrl,
+                response -> {
+                    try {
+                        List<Product> pList = new ArrayList<>();
+                        for (int i = 0; i < response.length(); i++) {
+                            pList.add(getProduct(response.getJSONObject(i)));
+                        }
+                        data.setValue(pList);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {}
+        );
+        enqueueRequest(request);
+
+        return data;
     }
 
-    public LiveData<ProductDetails> getDetailedProduct() {
-        return detailedProduct;
+    public LiveData<ProductDetails> getProductDetails(String pid) {
+        MutableLiveData<ProductDetails> data = new MutableLiveData<>();
+
+        String url = Uri.parse(FETCH_PRODUCT_BY_UID_URL)
+                .buildUpon()
+                .appendQueryParameter("pid", pid)
+                .build()
+                .toString();
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                response -> {
+                    Log.d(TAG, "fetchProductDetailsByPid response: " + response);
+                    try {
+                        data.setValue(getProductDetails(response));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {}
+        );
+        enqueueRequest(request);
+
+        return data;
     }
 
-    public LiveData<List<OrderedProduct>> getCartProducts() {
-        return cartProducts;
-    }
+    public LiveData<List<OrderedProduct>> getCartProducts(String uid) {
+        MutableLiveData<List<OrderedProduct>> data = new MutableLiveData<>();
 
-    public LiveData<OrderDetails> getDetailedOrder() {
-        return detailedOrder;
-    }
-
-    public LiveData<List<Chat>> getChats() {
-        return chats;
-    }
-
-    public LiveData<List<ChatListItem>> getChatListItems() {
-        return chatListItems;
-    }
-
-    /* setters */
-    private void setUser(User user) {
-        addUserToServer(user);
-        mUser.setValue(user);
-
-        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
-            @Override
-            public void onSuccess(InstanceIdResult instanceIdResult) {
-                String token = instanceIdResult.getToken();
-
-                if (user == null) {
-                    unregisterUserToken(token);
-                } else {
-                    String uid = user.getUid();
-                    registerUserToken(uid, token);
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                FETCH_CART_PRODUCTS_URL,
+                response -> {
+                    try {
+                        JSONArray jsonArray = new JSONArray(response);
+                        List<OrderedProduct> pList = new ArrayList<>();
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            pList.add(getOrderedProduct(jsonArray.getJSONObject(i)));
+                        }
+                        data.setValue(pList);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
                 }
+        ) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("uid", uid);
+                return params;
             }
-        });
+        };
+        enqueueRequest(request);
+
+        return data;
     }
 
-    private void setCategories(List<Category> categoryList) {
-        for (Category c : categoryList)
-            catMap.put(c.getName(), c.getId());
-        categories.setValue(categoryList);
+    public LiveData<OrderDetails> getOrderDetails(String oid) {
+        MutableLiveData<OrderDetails> data = new MutableLiveData<>();
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                FETCH_ORDER_DETAILS_URL,
+                response -> {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response);
+                        data.setValue(getOrderDetails(jsonObject));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("oid", oid);
+                return params;
+            }
+        };
+        enqueueRequest(request);
+
+        return data;
     }
 
-    /* remote database querying */
+    public LiveData<List<Chat>> getChats(String senderToken, String receiverToken, String pid) {
+        MutableLiveData<List<Chat>> data = new MutableLiveData<>();
 
-        // --------- User ---------
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                FETCH_CHATS_URL,
+                response -> {
+                    Log.d(TAG, "fetchChat response: " + response);
+                    List<Chat> chList = new ArrayList<>();
+                    try {
+                        JSONArray jsonArray = new JSONArray(response);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            chList.add(getChat(jsonArray.getJSONObject(i)));
+                        }
+                        data.setValue(chList);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                    Log.d(TAG, "sendMsg url error: " + error);
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("sender_token", senderToken);
+                params.put("receiver_token", receiverToken);
+                params.put("pid", pid);
+                return params;
+            }
+        };
+        enqueueRequest(request);
 
-    private GoogleSignInOptions getGoogleSignOptions() {
-        if (gso == null) {
-            gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestEmail()
-                    .build();
-        }
-        return gso;
+        return data;
     }
 
+    public LiveData<List<ChatListItem>> getChatListItems(String receiverToken) {
+        MutableLiveData<List<ChatListItem>> data = new MutableLiveData<>();
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                FETCH_CHAT_LIST_ITEMS_URL,
+                response -> {
+                    Log.d(TAG, "fetchChat response: " + response);
+                    List<ChatListItem> chList = new ArrayList<>();
+                    try {
+                        JSONArray jsonArray = new JSONArray(response);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            chList.add(getChatListItem(jsonArray.getJSONObject(i)));
+                        }
+                        data.setValue(chList);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                },
+                error -> {
+                    Log.d(TAG, "sendMsg url error: " + error);
+                }
+        ) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("receiver_token", receiverToken);
+                return params;
+            }
+        };
+        enqueueRequest(request);
+
+        return data;
+    }
+
+    /* login apis */
     public GoogleSignInClient getGoogleSignInClient() {
         if (mGoogleSignInClient == null) {
             mGoogleSignInClient = GoogleSignIn.getClient(mContext, getGoogleSignOptions());
@@ -231,7 +390,7 @@ public class ECommerceNetwork {
         if ((facebookAccessToken = AccessToken.getCurrentAccessToken()) != null) {
             loginFromFacebookAccessToken(facebookAccessToken);
         } else if ((googleSignInAccount = GoogleSignIn.getLastSignedInAccount(mContext)) != null) {
-            setUser(adaptUserFromGoogleSignInAccount(googleSignInAccount));
+            setUser(getUser(googleSignInAccount));
         } else {
             setUser(null);
         }
@@ -264,7 +423,7 @@ public class ECommerceNetwork {
     public void signInFromGoogleSignInTask(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            setUser(adaptUserFromGoogleSignInAccount(account));
+            setUser(getUser(account));
         } catch (ApiException e) {
             setUser(null);
         }
@@ -288,6 +447,10 @@ public class ECommerceNetwork {
                     }
                 });
     }
+
+    /* remote database querying */
+
+        // --------- User ---------
 
     private void addUserToServer(User user) {
         if (user == null) return;
@@ -356,146 +519,7 @@ public class ECommerceNetwork {
         enqueueRequest(request);
     }
 
-        // ------ category -------
-
-    public long getCatIdByName(String categoryName) {
-        Long id = catMap.get(categoryName);
-        if (id == null) return -1;
-        return id;
-    }
-
-
-    public void refreshCategories() {
-        JsonArrayRequest request = new JsonArrayRequest(
-                CAT_JSON_URL,
-                response -> {
-                    List<Category> categories = new ArrayList<>();
-                    try {
-                        for (int i = 0; i < response.length(); i++) {
-                            JSONObject jsonObject = response.getJSONObject(i);
-                            int catId = jsonObject.getInt("cat_id");
-                            String catName = jsonObject.getString("cat_name");
-                            String imgUrl = HOST_URL + jsonObject.getString("img_dir");
-
-                            categories.add(new Category(catId, catName, imgUrl));
-                        }
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    setCategories(categories);
-                },
-                error -> {
-                    Toast.makeText(mContext, "Json Response Error", Toast.LENGTH_SHORT).show();
-                }
-        );
-
-        enqueueRequest(request);
-    }
-
         // ------ product -------
-
-    private Product getProduct(JSONObject jsonObject) throws JSONException {
-        long pid = jsonObject.getLong("pid");
-        String uid = jsonObject.getString("uid");
-        long cid = jsonObject.getLong("cat_id");
-        String name = jsonObject.getString("pname");
-        String imgUrl = HOST_URL + jsonObject.getString("img_dir");
-
-        return new Product(pid, uid, cid, name, imgUrl);
-    }
-
-    private ProductDetails getProductDetails(JSONObject jsonObject) throws JSONException {
-        long pid = jsonObject.getLong("pid");
-        String sellerId = jsonObject.getString("seller_id");
-        String product = jsonObject.getString("product");
-        String category = jsonObject.getString("category");
-        String imgUrl = HOST_URL + jsonObject.getString("img_dir");
-        String date = jsonObject.getString("upload_time").split("\\s+")[0];
-        double price = jsonObject.getLong("price");
-        String seller = jsonObject.getString("seller");
-        String contact = jsonObject.getString("contact");
-        String sellerToken = jsonObject.getString("seller_token");
-
-        return new ProductDetails(pid, sellerId, product, category, imgUrl, date, price, seller, contact, sellerToken);
-    }
-
-    public void fetchProductDetailsByPid(String pid) {
-        String url = Uri.parse(FETCH_PRODUCT_BY_UID_URL)
-                .buildUpon()
-                .appendQueryParameter("pid", pid)
-                .build()
-                .toString();
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.GET,
-                url,
-                null,
-                response -> {
-                    Log.d(TAG, "fetchProductDetailsByPid response: " + response);
-                    try {
-                        detailedProduct.setValue(getProductDetails(response));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                error -> {}
-        );
-
-        enqueueRequest(request);
-    }
-
-    public void fetchProductsByCatId(String catId) {
-        Uri.Builder builder = Uri.parse(FETCH_PRODUCTS_BY_CAT_ID_URL).buildUpon();
-        builder.appendQueryParameter("cat_id", catId);
-
-        JsonArrayRequest request = new JsonArrayRequest(
-                Request.Method.GET,
-                builder.toString(),
-                null,
-                response -> {
-                    try {
-                        List<Product> pList = new ArrayList<>();
-                        for (int i = 0; i < response.length(); i++) {
-                            pList.add(getProduct(response.getJSONObject(i)));
-                        }
-                        products.setValue(pList);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                error -> {
-                }
-        );
-
-        enqueueRequest(request);
-    }
-
-    public void fetchRecentProducts() {
-        String recentProductsUrl = Uri.parse(FETCH_RECENT_PRODUCTS_URL)
-                .buildUpon()
-                .appendQueryParameter("limit", "5")
-                .build()
-                .toString();
-
-        JsonArrayRequest request = new JsonArrayRequest(
-                recentProductsUrl,
-                response -> {
-                    try {
-                        List<Product> pList = new ArrayList<>();
-                        for (int i = 0; i < response.length(); i++) {
-                            pList.add(getProduct(response.getJSONObject(i)));
-                        }
-                        recentProducts.setValue(pList);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                error -> {}
-        );
-
-        enqueueRequest(request);
-    }
 
     public void uploadProduct(String uid, String pName, String catId, String img, String price) {
         Log.d(TAG, "uploadProduct uid: " + uid);
@@ -534,25 +558,6 @@ public class ECommerceNetwork {
 
         // ------ cart -------
 
-    private OrderedProduct getOrderedProduct(JSONObject jsonObject) throws JSONException {
-        long oid = jsonObject.getLong("oid");
-        String productName = jsonObject.getString("product");
-        String imgUrl = HOST_URL + jsonObject.getString("img_dir");
-
-        return new OrderedProduct(oid, productName, imgUrl);
-    }
-
-    private OrderDetails getOrderDetails(JSONObject jsonObject) throws JSONException {
-        long oid = jsonObject.getLong("oid");
-        String productName = jsonObject.getString("pname");
-        String imgUrl = HOST_URL + jsonObject.getString("img_dir");
-        String category = jsonObject.getString("category");
-        String date = jsonObject.getString("order_time").split("\\s+")[0];
-        double price = jsonObject.getDouble("price");
-
-        return new OrderDetails(oid, productName, imgUrl, category, date, price);
-    }
-
     public void addToCart(String uid, String pid) {
         StringRequest request = new StringRequest(
                 Request.Method.POST,
@@ -569,62 +574,6 @@ public class ECommerceNetwork {
                 Map<String, String> params = new HashMap<>();
                 params.put("uid", uid);
                 params.put("pid", pid);
-                return params;
-            }
-        };
-
-        enqueueRequest(request);
-    }
-
-    public void fetchCartProducts(String uid) {
-        StringRequest request = new StringRequest(
-                Request.Method.POST,
-                FETCH_CART_PRODUCTS_URL,
-                response -> {
-                    try {
-                        JSONArray jsonArray = new JSONArray(response);
-                        List<OrderedProduct> pList = new ArrayList<>();
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            pList.add(getOrderedProduct(jsonArray.getJSONObject(i)));
-                        }
-                        cartProducts.setValue(pList);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                error -> {
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("uid", uid);
-                return params;
-            }
-        };
-
-        enqueueRequest(request);
-    }
-
-    public void fetchOrderDetails(String oid) {
-        StringRequest request = new StringRequest(
-                Request.Method.POST,
-                FETCH_ORDER_DETAILS_URL,
-                response -> {
-                    try {
-                        JSONObject jsonObject = new JSONObject(response);
-                        detailedOrder.setValue(getOrderDetails(jsonObject));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                error -> {
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("oid", oid);
                 return params;
             }
         };
@@ -653,27 +602,6 @@ public class ECommerceNetwork {
     }
 
         // ------ chat -------
-
-    private Chat getChat(JSONObject jsonObject) throws JSONException {
-        String senderToken = jsonObject.getString("sender_token");
-        String receiverToken = jsonObject.getString("receiver_token");
-        long pid = jsonObject.getLong("pid");
-        String msg = jsonObject.getString("msg");
-        String time = jsonObject.getString("upload_time");
-
-        return new Chat(senderToken, receiverToken, pid, msg, time);
-    }
-
-    private ChatListItem getChatListItem(JSONObject jsonObject) throws JSONException {
-        long pid = jsonObject.getLong("pid");
-        String senderToken = jsonObject.getString("sender_token");
-        String receiverToken = jsonObject.getString("receiver_token");
-        String msg = jsonObject.getString("msg");
-        String sender = jsonObject.getString("sender");
-        String imgUrl = jsonObject.getString("img_dir");
-
-        return new ChatListItem(pid, senderToken, receiverToken, msg, sender, imgUrl);
-    }
 
     public void sendMsg(String senderToken, String receiverToken, String pid, String msg) {
         StringRequest request = new StringRequest(
@@ -706,81 +634,108 @@ public class ECommerceNetwork {
         enqueueRequest(request);
     }
 
-    public void fetchChat(String senderToken, String receiverToken, String pid) {
-        StringRequest request = new StringRequest(
-                Request.Method.POST,
-                FETCH_CHATS_URL,
-                response -> {
-                    Log.d(TAG, "fetchChat response: " + response);
-                    List<Chat> chList = new ArrayList<>();
-                    try {
-                        JSONArray jsonArray = new JSONArray(response);
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            chList.add(getChat(jsonArray.getJSONObject(i)));
-                        }
-                        chats.setValue(chList);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                error -> {
-                    Log.d(TAG, "sendMsg url error: " + error);
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("sender_token", senderToken);
-                params.put("receiver_token", receiverToken);
-                params.put("pid", pid);
-                return params;
-            }
-        };
+    /* helper methods */
 
-        enqueueRequest(request);
-    }
-
-    public void fetchChatListItems(String receiverToken) {
-        StringRequest request = new StringRequest(
-                Request.Method.POST,
-                FETCH_CHAT_LIST_ITEMS_URL,
-                response -> {
-                    Log.d(TAG, "fetchChat response: " + response);
-                    List<ChatListItem> chList = new ArrayList<>();
-                    try {
-                        JSONArray jsonArray = new JSONArray(response);
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            chList.add(getChatListItem(jsonArray.getJSONObject(i)));
-                        }
-                        chatListItems.setValue(chList);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                },
-                error -> {
-                    Log.d(TAG, "sendMsg url error: " + error);
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("receiver_token", receiverToken);
-                return params;
-            }
-        };
-
-        enqueueRequest(request);
-    }
-
-    /* adapters */
-
-    private User adaptUserFromGoogleSignInAccount(GoogleSignInAccount account) {
+    private User getUser(GoogleSignInAccount account) {
         String uid = account.getId();
         String email = account.getEmail();
         String fullName = account.getDisplayName();
         Uri imgUrl = account.getPhotoUrl();
 
         return new User(uid, email, fullName, imgUrl);
+    }
+
+    private GoogleSignInOptions getGoogleSignOptions() {
+        if (gso == null) {
+            gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestEmail()
+                    .build();
+        }
+        return gso;
+    }
+
+    private Product getProduct(JSONObject jsonObject) throws JSONException {
+        long pid = jsonObject.getLong("pid");
+        String uid = jsonObject.getString("uid");
+        long cid = jsonObject.getLong("cat_id");
+        String name = jsonObject.getString("pname");
+        String imgUrl = HOST_URL + jsonObject.getString("img_dir");
+
+        return new Product(pid, uid, cid, name, imgUrl);
+    }
+
+    private ProductDetails getProductDetails(JSONObject jsonObject) throws JSONException {
+        long pid = jsonObject.getLong("pid");
+        String sellerId = jsonObject.getString("seller_id");
+        String product = jsonObject.getString("product");
+        String category = jsonObject.getString("category");
+        String imgUrl = HOST_URL + jsonObject.getString("img_dir");
+        String date = jsonObject.getString("upload_time").split("\\s+")[0];
+        double price = jsonObject.getLong("price");
+        String seller = jsonObject.getString("seller");
+        String contact = jsonObject.getString("contact");
+        String sellerToken = jsonObject.getString("seller_token");
+
+        return new ProductDetails(pid, sellerId, product, category, imgUrl, date, price, seller, contact, sellerToken);
+    }
+
+    private OrderedProduct getOrderedProduct(JSONObject jsonObject) throws JSONException {
+        long oid = jsonObject.getLong("oid");
+        String productName = jsonObject.getString("product");
+        String imgUrl = HOST_URL + jsonObject.getString("img_dir");
+
+        return new OrderedProduct(oid, productName, imgUrl);
+    }
+
+    private OrderDetails getOrderDetails(JSONObject jsonObject) throws JSONException {
+        long oid = jsonObject.getLong("oid");
+        String productName = jsonObject.getString("pname");
+        String imgUrl = HOST_URL + jsonObject.getString("img_dir");
+        String category = jsonObject.getString("category");
+        String date = jsonObject.getString("order_time").split("\\s+")[0];
+        double price = jsonObject.getDouble("price");
+
+        return new OrderDetails(oid, productName, imgUrl, category, date, price);
+    }
+
+    private Chat getChat(JSONObject jsonObject) throws JSONException {
+        String senderToken = jsonObject.getString("sender_token");
+        String receiverToken = jsonObject.getString("receiver_token");
+        long pid = jsonObject.getLong("pid");
+        String msg = jsonObject.getString("msg");
+        String time = jsonObject.getString("upload_time");
+
+        return new Chat(senderToken, receiverToken, pid, msg, time);
+    }
+
+    private ChatListItem getChatListItem(JSONObject jsonObject) throws JSONException {
+        long pid = jsonObject.getLong("pid");
+        String senderToken = jsonObject.getString("sender_token");
+        String receiverToken = jsonObject.getString("receiver_token");
+        String msg = jsonObject.getString("msg");
+        String sender = jsonObject.getString("sender");
+        String imgUrl = jsonObject.getString("img_dir");
+
+        return new ChatListItem(pid, senderToken, receiverToken, msg, sender, imgUrl);
+    }
+
+    private void setUser(User user) {
+        addUserToServer(user);
+        mUser.setValue(user);
+
+        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
+            @Override
+            public void onSuccess(InstanceIdResult instanceIdResult) {
+                String token = instanceIdResult.getToken();
+
+                if (user == null) {
+                    unregisterUserToken(token);
+                } else {
+                    String uid = user.getUid();
+                    registerUserToken(uid, token);
+                }
+            }
+        });
     }
 
     private <T>void enqueueRequest(Request<T> request) {

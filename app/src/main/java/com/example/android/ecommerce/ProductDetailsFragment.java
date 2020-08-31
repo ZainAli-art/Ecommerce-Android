@@ -87,17 +87,11 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
         pid = args.getString(PRODUCT_ID);
         uid = String.valueOf(userViewModel.getUser().getValue().getUid());
 
-        productViewModel.getDetailedProduct().observe(getViewLifecycleOwner(), productDetails -> {
+        productViewModel.getProductDetails(pid).observe(getViewLifecycleOwner(), productDetails -> {
             if (productDetails != null) {
                 updateUi(productDetails);
             }
         });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        productViewModel.fetchProductDetailsByPid(pid);
     }
 
     @Override
@@ -133,7 +127,7 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
             @Override
             public void onSuccess(InstanceIdResult instanceIdResult) {
                 String senderToken = instanceIdResult.getToken();
-                String receiverToken = productViewModel.getDetailedProduct().getValue().getSellerToken();
+                String receiverToken = productViewModel.getProductDetails(pid).getValue().getSellerToken();
                 Bundle args = new Bundle();
                 args.putString(ChatFragment.SENDER_TOKEN_KEY, senderToken);
                 args.putString(ChatFragment.RECEIVER_TOKEN_KEY, receiverToken);

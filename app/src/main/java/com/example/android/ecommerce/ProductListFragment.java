@@ -51,12 +51,10 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
         String catId = args.getString(HomeFragment.SELECTED_CAT_ID);
 
         // observers
-        productViewModel.getProducts().observe(getViewLifecycleOwner(), products -> {
+        productViewModel.getProducts(catId).observe(getViewLifecycleOwner(), products -> {
             this.products = products;
             adapter.setProducts(products);
         });
-
-        productViewModel.fetchProductsByCatId(catId);
     }
 
     @Override

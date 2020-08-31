@@ -37,36 +37,32 @@ public class ECommerceRepository {
         return eCommerceNetwork.getCategories();
     }
 
-    public LiveData<List<Product>> getProducts() {
-        return eCommerceNetwork.getProducts();
+    public LiveData<List<Product>> getProducts(String catId) {
+        return eCommerceNetwork.getProducts(catId);
     }
 
     public LiveData<List<Product>> getRecentProducts() {
         return eCommerceNetwork.getRecentProducts();
     }
 
-    public LiveData<ProductDetails> getDetailedProduct() {
-        return eCommerceNetwork.getDetailedProduct();
+    public LiveData<ProductDetails> getProductDetails(String pid) {
+        return eCommerceNetwork.getProductDetails(pid);
     }
 
-    public LiveData<List<OrderedProduct>> getCartProducts() {
-        return eCommerceNetwork.getCartProducts();
+    public LiveData<List<OrderedProduct>> getCartProducts(String uid) {
+        return eCommerceNetwork.getCartProducts(uid);
     }
 
-    public LiveData<OrderDetails> getDetailedOrder() {
-        return eCommerceNetwork.getDetailedOrder();
+    public LiveData<OrderDetails> getOrderDetails(String oid) {
+        return eCommerceNetwork.getOrderDetails(oid);
     }
 
-    public LiveData<List<Chat>> getChats() {
-        return eCommerceNetwork.getChats();
+    public LiveData<List<Chat>> getChats(String senderToken, String receiverToken, String pid) {
+        return eCommerceNetwork.getChats(senderToken, receiverToken, pid);
     }
 
-    public LiveData<List<ChatListItem>> getChatListItems() {
-        return eCommerceNetwork.getChatListItems();
-    }
-
-    public long getCatIdByName(String categoryName) {
-        return eCommerceNetwork.getCatIdByName(categoryName);
+    public LiveData<List<ChatListItem>> getChatListItems(String receiverToken) {
+        return eCommerceNetwork.getChatListItems(receiverToken);
     }
 
     public GoogleSignInClient getGoogleSignInClient() {
@@ -93,25 +89,7 @@ public class ECommerceRepository {
         eCommerceNetwork.signOut(activity);
     }
 
-    // ------ category -------
-
-    public void refreshCategories() {
-        eCommerceNetwork.refreshCategories();
-    }
-
     // ------ product -------
-
-    public void fetchProductDetailsByPid(String pid) {
-        eCommerceNetwork.fetchProductDetailsByPid(pid);
-    }
-
-    public void fetchProductsByCatId(String catId) {
-        eCommerceNetwork.fetchProductsByCatId(catId);
-    }
-
-    public void fetchRecentProducts() {
-        eCommerceNetwork.fetchRecentProducts();
-    }
 
     public void uploadProduct(String uid, String pName, String catId, String img, String price) {
         eCommerceNetwork.uploadProduct(uid, pName, catId, img, price);
@@ -123,14 +101,6 @@ public class ECommerceRepository {
         eCommerceNetwork.addToCart(uid, pid);
     }
 
-    public void fetchCartProducts(String uid) {
-        eCommerceNetwork.fetchCartProducts(uid);
-    }
-
-    public void fetchOrderDetails(String oid) {
-        eCommerceNetwork.fetchOrderDetails(oid);
-    }
-
     public void deleteOrder(String oid) {
         eCommerceNetwork.deleteOrder(oid);
     }
@@ -139,13 +109,5 @@ public class ECommerceRepository {
 
     public void sendMsg(String senderToken, String receiverToken, String pid, String msg) {
         eCommerceNetwork.sendMsg(senderToken, receiverToken, pid, msg);
-    }
-
-    public void fetchChat(String senderToken, String receiverToken, String pid) {
-        eCommerceNetwork.fetchChat(senderToken, receiverToken, pid);
-    }
-
-    public void fetchChatListItems(String receiverToken) {
-        eCommerceNetwork.fetchChatListItems(receiverToken);
     }
 }

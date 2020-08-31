@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -64,19 +63,16 @@ public class OrderedProductRecyclerViewAdapter extends RecyclerView.Adapter<Orde
     public static class OPViewHolder extends RecyclerView.ViewHolder {
         private ImageView pImage;
         private TextView pText;
-        private ImageButton delOrderBtn;
         private Context mContext;
 
         public OPViewHolder(@NonNull View itemView, OrderedProductItemListener listener, Context context) {
             super(itemView);
             pImage = itemView.findViewById(R.id.oImage);
             pText = itemView.findViewById(R.id.oTitle);
-            delOrderBtn = itemView.findViewById(R.id.delOrderBtn);
             mContext = context;
             itemView.setOnClickListener((view) -> listener.onClickOrderedProduct(getAdapterPosition()));
-            delOrderBtn.setOnClickListener((view) -> {
-                listener.onClickDeleteOrderedProduct(getAdapterPosition());
-            });
+            itemView.findViewById(R.id.delOrderBtn).setOnClickListener((view) ->
+                    listener.onClickDeleteOrderedProduct(getAdapterPosition()));
         }
 
         public void setImage(String imgUrl) {

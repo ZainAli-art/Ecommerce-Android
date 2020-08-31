@@ -72,8 +72,8 @@ public class MainActivity extends AppCompatActivity {
             String senderToken = intent.getStringExtra("senderToken");
             String receiverToken = intent.getStringExtra("receiverToken");
             String pid = intent.getStringExtra("pid");
-            chatViewModel.fetchChat(senderToken, receiverToken, pid);
-            chatViewModel.fetchChatListItems(receiverToken);
+//            chatViewModel.fetchChat(senderToken, receiverToken, pid);
+//            chatViewModel.fetchChatListItems(receiverToken);
         }
     }
 }

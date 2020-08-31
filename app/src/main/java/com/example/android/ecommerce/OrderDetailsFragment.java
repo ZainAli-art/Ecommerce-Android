@@ -67,13 +67,7 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
         Button removeFromCartBtn = view.findViewById(R.id.removeFromCartBtn);
         removeFromCartBtn.setOnClickListener(this);
 
-        cartViewModel.getDetailedOrder().observe(getViewLifecycleOwner(), this::updateUi);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        cartViewModel.fetchOrderDetails(oid);
+        cartViewModel.getOrderDetails(oid).observe(getViewLifecycleOwner(), this::updateUi);
     }
 
     private void updateUi(OrderDetails orderDetails) {
@@ -96,7 +90,6 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
 
     private void removeOrder() {
         cartViewModel.deleteOrder(oid);
-        cartViewModel.fetchCartProducts(uid);
         navController.popBackStack();
     }
 }

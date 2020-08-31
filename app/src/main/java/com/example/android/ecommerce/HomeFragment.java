@@ -82,45 +82,23 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         userViewModel.signInLastSignedInUser();
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
-            if (user == null && NavigationUtils.isValidInContext(navController, R.id.homeFragment)) {
+            if (internetPermissionGranted() &&
+                    user == null && NavigationUtils.isValidInContext(navController, R.id.homeFragment)) {
                 navController.navigate(R.id.action_homeFragment_to_signInFragment);
             }
         });
         categoryViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
+            if (!internetPermissionGranted()) return;
             this.categories = categories;
             categoryAdapter.setCategories(categories);
         });
         productViewModel.getRecentProducts().observe(getViewLifecycleOwner(), recentProducts -> {
+            if (!internetPermissionGranted()) return;
             this.recentProducts = recentProducts;
             recentProductsAdapter.setProducts(recentProducts);
         });
 
         requestPermissions(new String[]{Manifest.permission.INTERNET}, REQUEST_INTERNET);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        int internetPermission = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.INTERNET);
-
-        if (internetPermission == PackageManager.PERMISSION_GRANTED) {
-            categoryViewModel.refreshCategories();
-            productViewModel.fetchRecentProducts();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == REQUEST_INTERNET) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                categoryViewModel.refreshCategories();
-                productViewModel.fetchRecentProducts();
-            } else {
-                Toast.makeText(requireContext(), "Internet Permission Denied", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     @Override
@@ -139,5 +117,10 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         args.putString(ProductDetailsFragment.PRODUCT_ID, pid);
 
         navController.navigate(R.id.action_homeFragment_to_productDetailsFragment, args);
+    }
+
+    private boolean internetPermissionGranted() {
+        return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.INTERNET)
+                == PackageManager.PERMISSION_GRANTED;
     }
 }

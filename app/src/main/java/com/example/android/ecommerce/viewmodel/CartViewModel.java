@@ -19,24 +19,16 @@ public class CartViewModel extends AndroidViewModel {
         repo = new ECommerceRepository(application);
     }
 
-    public LiveData<List<OrderedProduct>> getCartProducts() {
-        return repo.getCartProducts();
+    public LiveData<List<OrderedProduct>> getCartProducts(String uid) {
+        return repo.getCartProducts(uid);
     }
 
-    public LiveData<OrderDetails> getDetailedOrder() {
-        return repo.getDetailedOrder();
+    public LiveData<OrderDetails> getOrderDetails(String oid) {
+        return repo.getOrderDetails(oid);
     }
 
     public void addToCart(String uid, String pid) {
         repo.addToCart(uid, pid);
-    }
-
-    public void fetchCartProducts(String uid) {
-        repo.fetchCartProducts(uid);
-    }
-
-    public void fetchOrderDetails(String oid) {
-        repo.fetchOrderDetails(oid);
     }
 
     public void deleteOrder(String oid) {

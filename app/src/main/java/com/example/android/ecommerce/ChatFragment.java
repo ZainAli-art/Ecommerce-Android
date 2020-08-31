@@ -15,7 +15,6 @@ import android.widget.EditText;
 
 import com.example.android.ecommerce.adapters.ChatRecyclerViewAdapter;
 import com.example.android.ecommerce.viewmodel.ChatViewModel;
-import com.example.android.ecommerce.viewmodel.UserViewModel;
 
 public class ChatFragment extends Fragment implements View.OnClickListener {
     public static final String SENDER_TOKEN_KEY = "sender_token";
@@ -56,15 +55,9 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(ChatViewModel.class);
 
-        chatViewModel.getChats().observe(getViewLifecycleOwner(), chats -> {
+        chatViewModel.getChats(senderToken, receiverToken, pid).observe(getViewLifecycleOwner(), chats -> {
             adapter.setChatList(chats);
         });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        refresh();
     }
 
     @Override
@@ -80,11 +73,5 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         String msg = msgEditText.getText().toString();
         chatViewModel.sendMsg(senderToken, receiverToken, pid, msg);
         msgEditText.setText("");
-        refresh();
-    }
-
-    public void refresh() {
-        chatViewModel.fetchChat(senderToken, receiverToken, pid);
-        chatViewModel.fetchChatListItems(receiverToken);
     }
 }

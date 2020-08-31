@@ -20,28 +20,16 @@ public class ProductViewModel extends AndroidViewModel {
         repo = new ECommerceRepository(application);
     }
 
-    public LiveData<List<Product>> getProducts() {
-        return repo.getProducts();
+    public LiveData<List<Product>> getProducts(String catId) {
+        return repo.getProducts(catId);
     }
 
     public LiveData<List<Product>> getRecentProducts() {
         return repo.getRecentProducts();
     }
 
-    public LiveData<ProductDetails> getDetailedProduct() {
-        return repo.getDetailedProduct();
-    }
-
-    public void fetchProductDetailsByPid(String pid) {
-        repo.fetchProductDetailsByPid(pid);
-    }
-
-    public void fetchProductsByCatId(String catId) {
-        repo.fetchProductsByCatId(catId);
-    }
-
-    public void fetchRecentProducts() {
-        repo.fetchRecentProducts();
+    public LiveData<ProductDetails> getProductDetails(String pid) {
+        return repo.getProductDetails(pid);
     }
 
     public void uploadProduct(String uid, String pName, String catId, String img, String price) {
