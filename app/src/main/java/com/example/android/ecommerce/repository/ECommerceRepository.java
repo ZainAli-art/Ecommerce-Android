@@ -39,7 +39,7 @@ public class ECommerceRepository {
     }
 
     private ECommerceRepository(Application application) {
-        eCommerceNetwork = new ECommerceNetwork(application.getApplicationContext());
+        eCommerceNetwork = ECommerceNetwork.getInstance(application.getApplicationContext());
     }
 
     public LiveData<User> getUser() {

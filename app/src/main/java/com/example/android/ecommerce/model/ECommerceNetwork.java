@@ -52,6 +52,8 @@ import static com.example.android.ecommerce.MySingleton.HOST_URL;
 public class ECommerceNetwork {
     private static final String TAG = "ECommerceNetwork";
 
+    public static volatile ECommerceNetwork INSTANCE;
+
     public static final String USER_BASE_URL = HOST_URL + "scripts/user/";
     public static final String CATEGORY_BASE_URL = HOST_URL + "scripts/category/";
     public static final String FCM_BASE_URL = HOST_URL + "scripts/fcm/";
@@ -88,7 +90,18 @@ public class ECommerceNetwork {
 
     private MutableLiveData<User> mUser;
 
-    public ECommerceNetwork(Context context) {
+    public static ECommerceNetwork getInstance(Context context) {
+        if (INSTANCE == null) {
+            synchronized (ECommerceNetwork.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new ECommerceNetwork(context);
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    private ECommerceNetwork(Context context) {
         mContext = context;
         mUser = new MutableLiveData<>();
         facebookAccessTokenTracker = new AccessTokenTracker() {
