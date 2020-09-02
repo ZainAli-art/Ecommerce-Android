@@ -18,6 +18,8 @@ import com.example.android.ecommerce.model.OrderedProduct;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.android.ecommerce.utils.Constants.BASE_URL;
+
 public class OrderedProductRecyclerViewAdapter extends RecyclerView.Adapter<OrderedProductRecyclerViewAdapter.OPViewHolder>
         implements ECommerceRecyclerViewAdaptable<OrderedProduct> {
     List<OrderedProduct> orderedProducts;
@@ -44,8 +46,8 @@ public class OrderedProductRecyclerViewAdapter extends RecyclerView.Adapter<Orde
     @Override
     public void onBindViewHolder(@NonNull OPViewHolder holder, int position) {
         OrderedProduct orderedProduct = orderedProducts.get(position);
-        holder.setImage(orderedProduct.getImgUrl());
-        holder.setTitle(orderedProduct.getProductName());
+        holder.setImage(orderedProduct.imgUrl);
+        holder.setTitle(orderedProduct.productName);
     }
 
     @Override
@@ -83,7 +85,7 @@ public class OrderedProductRecyclerViewAdapter extends RecyclerView.Adapter<Orde
         }
 
         public void setImage(String imgUrl) {
-            Glide.with(mContext).load(imgUrl).into(pImage);
+            Glide.with(mContext).load(BASE_URL + imgUrl).into(pImage);
         }
 
         public void setTitle(CharSequence title) {

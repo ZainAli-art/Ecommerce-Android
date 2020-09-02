@@ -20,15 +20,15 @@ public class ChatViewModel extends AndroidViewModel {
         repo = ECommerceRepository.getInstance(application);
     }
 
-    public LiveData<List<Chat>> getChats(String senderToken, String receiverToken, String pid) {
+    public LiveData<List<Chat>> getChats(String senderToken, String receiverToken, long pid) {
         return repo.getChats(senderToken, receiverToken, pid);
     }
 
-    public LiveData<List<ChatListItem>> getChatListItems(String receiverToken) {
-        return repo.getChatListItems(receiverToken);
+    public LiveData<List<ChatListItem>> getChatListItems() {
+        return repo.getChatListItems();
     }
 
-    public void sendMsg(String senderToken, String receiverToken, String pid, String msg) {
+    public void sendMsg(String senderToken, String receiverToken, long pid, String msg) {
         repo.sendMsg(senderToken, receiverToken, pid, msg);
     }
 }

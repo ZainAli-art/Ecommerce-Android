@@ -31,9 +31,9 @@ public class UserViewModel extends AndroidViewModel {
         return repo.getGoogleSignInClient();
     }
 
-    public void signInLastSignedInUser() {
-        repo.signInLastSignedInUser();
-    }
+//    public void signInLastSignedInUser() {
+//        repo.signInLastSignedInUser();
+//    }
 
     public CallbackManager getFacebookCallbackManager() {
         return repo.getFacebookCallbackManager();

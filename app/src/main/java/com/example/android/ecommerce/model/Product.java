@@ -1,40 +1,50 @@
 package com.example.android.ecommerce.model;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+import com.google.gson.annotations.SerializedName;
+
+import java.sql.Timestamp;
+import java.util.Date;
+
+@Entity(tableName = "products")
 public class Product {
     public static final int VERTICAL_TYPE = 0;
     public static final int HORIZONTAL_TYPE = 1;
 
-    private long pid;
-    private String uid;
-    private long catId;
-    private String name;
-    private String imgUrl;
+    @PrimaryKey
+    @NonNull
+    public long pid;
 
-    public Product(long pid, String uid, long catId, String name, String imgUrl) {
-        this.pid = pid;
+    public String uid;
+
+    @SerializedName("cat_id")
+    @ColumnInfo(name = "cat_id")
+    public long catId;
+
+    @SerializedName("pname")
+    @ColumnInfo(name = "pname")
+    public String name;
+
+    @SerializedName("img_dir")
+    @ColumnInfo(name = "img_dir")
+    public String imgUrl;
+
+    @SerializedName("upload_time")
+    @ColumnInfo(name = "upload_time")
+    public Timestamp uploadTime;
+
+    public double price;
+
+    public Product(String uid, long catId, String name, String imgUrl, Timestamp uploadTime, double price) {
         this.uid = uid;
         this.catId = catId;
         this.name = name;
         this.imgUrl = imgUrl;
-    }
-
-    public long getPid() {
-        return pid;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public long getCatId() {
-        return catId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
+        this.uploadTime = uploadTime;
+        this.price = price;
     }
 }

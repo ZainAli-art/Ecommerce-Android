@@ -47,7 +47,7 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(ProductViewModel.class);
         Bundle args = getArguments();
-        String catId = args.getString(HomeFragment.SELECTED_CAT_ID);
+        long catId = args.getLong(HomeFragment.SELECTED_CAT_ID);
 
         // observers
         productViewModel.getProducts(catId).observe(getViewLifecycleOwner(), products -> {
@@ -58,7 +58,7 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
     @Override
     public void onClickProduct(int pos) {
         Bundle args = new Bundle();
-        String pid = String.valueOf(adapter.getItem(pos).getPid());
+        String pid = String.valueOf(adapter.getItem(pos).pid);
         args.putString(ProductDetailsFragment.PRODUCT_ID, pid);
 
         navController.navigate(R.id.action_productListFragment_to_productDetailsFragment, args);

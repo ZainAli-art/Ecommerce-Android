@@ -15,29 +15,24 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavDeepLinkBuilder;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
+import com.example.android.ecommerce.repository.ECommerceRepository;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.example.android.ecommerce.MySingleton.HOST_URL;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMessagingServ";
 
-    public static final String BASE_URL = HOST_URL + "scripts/fcm/";
-    public static final String UPDATE_FCM_TOKEN_URL = BASE_URL + "update-fcm-token.php";
-    public static final String ADD_FCM_TOKEN_URL = BASE_URL + "add-fcm-token.php";
-    public static final String OLD_TOKEN_KEY = "MyFirebaseMessagingService.OLD_TOKEN";
-    public static final String PREFERENCES_NAME = "com.example.android.ecommerce.MyFirebaseMessagingService";
+    //    public static final String BASE_URL = HOST_URL + "scripts/fcm/";
+//    public static final String UPDATE_FCM_TOKEN_URL = BASE_URL + "update-fcm-token.php";
+//    public static final String ADD_FCM_TOKEN_URL = BASE_URL + "add-fcm-token.php";
     public static final int RECENT_PRODUCT_NOTIFCICATION_ID = 1;
     public static final int CHAT_NOTIFICATION_ID = 2;
+    public static final String OLD_TOKEN_KEY = "MyFirebaseMessagingService.OLD_TOKEN";
+    public static final String PREFERENCES_NAME = "com.example.android.ecommerce.MyFirebaseMessagingService";
     public static final String TAG_RECENT_PRODUCT = "newProduct";
     public static final String TAG_CHAT = "chat";
 
@@ -49,10 +44,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String oldToken = preferences.getString(OLD_TOKEN_KEY, null);
         preferences.edit().putString(OLD_TOKEN_KEY, s).apply();
 
+        ECommerceRepository repo = ECommerceRepository.getInstance(getApplication());
+
         if (oldToken == null) {
-            addNewTokenOnServer(s);
+//            addNewTokenOnServer(s);
+            repo.insertFcmToken(s);
         } else {
-            updateTokenOnServer(oldToken, s);
+//            updateTokenOnServer(oldToken, s);
+            repo.updateFcmToken(oldToken, s);
         }
     }
 
@@ -77,49 +76,49 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    private void updateTokenOnServer(String oldToken, String newToken) {
-        StringRequest request = new StringRequest(
-                Request.Method.POST,
-                UPDATE_FCM_TOKEN_URL,
-                response -> {
-                    Log.d(TAG, "updateTokenOnServer response: " + response);
-                },
-                error -> {
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("old_token", oldToken);
-                params.put("new_token", newToken);
-                return params;
-            }
-        };
-
-        MySingleton.getInstance(this).enqueueRequest(request);
-    }
-
-    private void addNewTokenOnServer(String token) {
-        StringRequest request = new StringRequest(
-                Request.Method.POST,
-                ADD_FCM_TOKEN_URL,
-                response -> {
-                    Log.d(TAG, "addNewTokenOnServer response: " + response);
-                },
-                error -> {
-                    error.printStackTrace();
-                }
-        ) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<>();
-                params.put("fcm_token", token);
-                return params;
-            }
-        };
-
-        MySingleton.getInstance(this).enqueueRequest(request);
-    }
+//    private void updateTokenOnServer(String oldToken, String newToken) {
+//        StringRequest request = new StringRequest(
+//                Request.Method.POST,
+//                UPDATE_FCM_TOKEN_URL,
+//                response -> {
+//                    Log.d(TAG, "updateTokenOnServer response: " + response);
+//                },
+//                error -> {
+//                }
+//        ) {
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//                Map<String, String> params = new HashMap<>();
+//                params.put("old_token", oldToken);
+//                params.put("new_token", newToken);
+//                return params;
+//            }
+//        };
+//
+//        MySingleton.getInstance(this).enqueueRequest(request);
+//    }
+//
+//    private void addNewTokenOnServer(String token) {
+//        StringRequest request = new StringRequest(
+//                Request.Method.POST,
+//                ADD_FCM_TOKEN_URL,
+//                response -> {
+//                    Log.d(TAG, "addNewTokenOnServer response: " + response);
+//                },
+//                error -> {
+//                    error.printStackTrace();
+//                }
+//        ) {
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//                Map<String, String> params = new HashMap<>();
+//                params.put("fcm_token", token);
+//                return params;
+//            }
+//        };
+//
+//        MySingleton.getInstance(this).enqueueRequest(request);
+//    }
 
     public void notifyRecentProduct(RemoteMessage remoteMessage) {
         String title = remoteMessage.getNotification().getTitle();
@@ -129,7 +128,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         try {
             largeIcon = Glide.with(this)
                     .asBitmap()
-                    .load(HOST_URL + imgUrl.toString())
+                    .load("192.168.8.101" + imgUrl.toString())
                     .submit(100, 100)
                     .get();
         } catch (ExecutionException e) {
@@ -161,7 +160,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String receiverToken = remoteMessage.getData().get("receiver_token");
         String pid = remoteMessage.getData().get("pid");
 
-            // --- trigger broadcast to refresh chat ---
+        // --- trigger broadcast to refresh chat ---
         Intent intent = new Intent(MainActivity.ACTION_REFRESH_CHAT);
         intent.setPackage(getPackageName());
         intent.putExtra("senderToken", senderToken);
@@ -169,7 +168,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         intent.putExtra("pid", pid);
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
 
-            // --- send notification ---
+        // --- send notification ---
         Bundle args = new Bundle();
         /* sender and receiver will be reversed in the chat */
         args.putString(ChatFragment.SENDER_TOKEN_KEY, receiverToken);
@@ -180,7 +179,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 //        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT, args);
 
-            // create pending intent for the notification
+        // create pending intent for the notification
         PendingIntent pendingIntent = new NavDeepLinkBuilder(this)
                 .setComponentName(MainActivity.class)
                 .setGraph(R.navigation.nav_graph)
@@ -188,7 +187,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setArguments(args)
                 .createPendingIntent();
 
-            // build and trigger notification
+        // build and trigger notification
         Notification notification = new NotificationCompat.Builder(this, getString(R.string.trans_channel_id))
                 .setSmallIcon(R.drawable.ic_launcher_foreground)    // required
                 .setContentTitle(title)

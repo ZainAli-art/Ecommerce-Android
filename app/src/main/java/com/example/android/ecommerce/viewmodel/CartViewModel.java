@@ -23,15 +23,15 @@ public class CartViewModel extends AndroidViewModel {
         return repo.getCartProducts(uid);
     }
 
-    public LiveData<OrderDetails> getOrderDetails(String oid) {
+    public LiveData<OrderDetails> getOrderDetails(long oid) {
         return repo.getOrderDetails(oid);
     }
 
-    public void addToCart(String uid, String pid) {
+    public void addToCart(String uid, long pid) {
         repo.addToCart(uid, pid);
     }
 
-    public void deleteOrder(String oid) {
+    public void deleteOrder(long oid) {
         repo.deleteOrder(oid);
     }
 }

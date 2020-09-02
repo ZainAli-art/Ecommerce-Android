@@ -1,18 +1,44 @@
 package com.example.android.ecommerce.model;
 
-public class ProductDetails {
-    private long pid;
-    private String sellerId;
-    private String product;
-    private String category;
-    private String imgUrl;
-    private String date;
-    private double price;
-    private String seller;
-    private String contact;
-    private String sellerToken;
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
-    public ProductDetails(long pid, String sellerId, String product, String category, String imgUrl, String date, double price, String seller, String contact, String sellerToken) {
+import com.google.gson.annotations.SerializedName;
+
+import java.util.Date;
+
+@Entity(tableName = "product_details")
+public class ProductDetails {
+    @PrimaryKey
+    @NonNull
+    public long pid;
+
+    @SerializedName("seller_id")
+    @ColumnInfo(name = "seller_id")
+    public String sellerId;
+
+    public String product;
+    public String category;
+
+    @SerializedName("img_dir")
+    @ColumnInfo(name = "img_dir")
+    public String imgUrl;
+
+    @SerializedName("upload_time")
+    @ColumnInfo(name = "upload_time")
+    public Date date;
+
+    public double price;
+    public String seller;
+    public String contact;
+
+    @SerializedName("seller_token")
+    @ColumnInfo(name = "seller_token")
+    public String sellerToken;
+
+    public ProductDetails(long pid, String sellerId, String product, String category, String imgUrl, Date date, double price, String seller, String contact, String sellerToken) {
         this.pid = pid;
         this.sellerId = sellerId;
         this.product = product;
@@ -23,45 +49,5 @@ public class ProductDetails {
         this.seller = seller;
         this.contact = contact;
         this.sellerToken = sellerToken;
-    }
-
-    public long getPid() {
-        return pid;
-    }
-
-    public String getSellerId() {
-        return sellerId;
-    }
-
-    public String getProduct() {
-        return product;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public String getSeller() {
-        return seller;
-    }
-
-    public String getContact() {
-        return contact;
-    }
-
-    public String getSellerToken() {
-        return sellerToken;
     }
 }

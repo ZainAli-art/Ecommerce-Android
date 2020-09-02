@@ -18,6 +18,8 @@ import com.example.android.ecommerce.model.ChatListItem;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.android.ecommerce.utils.Constants.BASE_URL;
+
 public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRecyclerViewAdapter.CLViewHolder>
         implements ECommerceRecyclerViewAdaptable<ChatListItem> {
     private List<ChatListItem> chatListItems;
@@ -82,7 +84,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
         }
 
         public void setImg(String imgUrl) {
-            Glide.with(mContext).load(imgUrl).into(senderImg);
+            Glide.with(mContext).load(BASE_URL + imgUrl).into(senderImg);
         }
 
         public void setSenderName(String name) {

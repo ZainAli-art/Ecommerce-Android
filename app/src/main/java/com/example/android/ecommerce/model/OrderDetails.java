@@ -1,43 +1,42 @@
 package com.example.android.ecommerce.model;
 
-public class OrderDetails {
-    private long oid;
-    private String productName;
-    private String imgUrl;
-    private String category;
-    private String date;
-    private double price;
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
-    public OrderDetails(long oid, String productName, String imgUrl, String category, String date, double price) {
+import com.google.gson.annotations.SerializedName;
+
+import java.util.Date;
+
+@Entity(tableName = "order_details")
+public class OrderDetails {
+    @PrimaryKey
+    @NonNull
+    public long oid;
+
+    @SerializedName("pname")
+    @ColumnInfo(name = "pname")
+    public String productName;
+
+    @SerializedName("img_dir")
+    @ColumnInfo(name = "img_dir")
+    public String imgUrl;
+
+    public String category;
+
+    @SerializedName("order_time")
+    @ColumnInfo(name = "order_time")
+    public Date orderDate;
+
+    public double price;
+
+    public OrderDetails(long oid, String productName, String imgUrl, String category, Date orderDate, double price) {
         this.oid = oid;
         this.productName = productName;
         this.imgUrl = imgUrl;
         this.category = category;
-        this.date = date;
+        this.orderDate = orderDate;
         this.price = price;
-    }
-
-    public long getOrderId() {
-        return oid;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public double getPrice() {
-        return price;
     }
 }

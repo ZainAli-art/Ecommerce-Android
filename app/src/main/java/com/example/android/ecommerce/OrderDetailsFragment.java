@@ -33,7 +33,7 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
     private TextView price;
     private TextView orderId;
 
-    private String oid;
+    private long oid;
     private String uid;
 
     @Override
@@ -48,7 +48,7 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
         super.onViewCreated(view, savedInstanceState);
 
         Bundle args = getArguments();
-        oid = args.getString(ORDER_DETAILS_ID);
+        oid = args.getLong(ORDER_DETAILS_ID);
         uid = args.getString(USER_ID);
 
         navController = NavHostFragment.findNavController(this);
@@ -71,12 +71,12 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
     }
 
     private void updateUi(OrderDetails orderDetails) {
-        Glide.with(requireContext()).load(orderDetails.getImgUrl()).into(img);
-        productName.setText(orderDetails.getProductName());
-        date.setText(orderDetails.getDate());
-        category.setText(orderDetails.getCategory());
-        price.setText("$ " + orderDetails.getPrice());
-        orderId.setText(String.valueOf(orderDetails.getOrderId()));
+        Glide.with(requireContext()).load(orderDetails.imgUrl).into(img);
+        productName.setText(orderDetails.productName);
+        date.setText(orderDetails.orderDate.toString());
+        category.setText(orderDetails.category);
+        price.setText("$ " + orderDetails.price);
+        orderId.setText(String.valueOf(orderDetails.oid));
     }
 
     @Override

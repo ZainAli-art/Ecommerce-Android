@@ -23,7 +23,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
 
     private String senderToken;
     private String receiverToken;
-    private String pid;
+    private long pid;
 
     private EditText msgEditText;
     private ChatViewModel chatViewModel;
@@ -42,7 +42,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         Bundle args = getArguments();
         senderToken = args.getString(SENDER_TOKEN_KEY);
         receiverToken = args.getString(RECEIVER_TOKEN_KEY);
-        pid = args.getString(PRODUCT_ID_KEY);
+        pid = args.getLong(PRODUCT_ID_KEY);
 
         RecyclerView chatRecyclerView = view.findViewById(R.id.chatRecyclerView);
         ChatRecyclerViewAdapter adapter = new ChatRecyclerViewAdapter(senderToken);

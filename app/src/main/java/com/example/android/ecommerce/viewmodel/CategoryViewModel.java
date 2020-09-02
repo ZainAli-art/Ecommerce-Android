@@ -28,12 +28,16 @@ public class CategoryViewModel extends AndroidViewModel {
         if (categories != null) {
             catMap = new HashMap<>();
             for (Category c : categories)
-                catMap.put(c.getName(), c.getId());
+                catMap.put(c.name, c.id);
         }
         return repo.getCategories();
     }
 
     public Long getCatIdByName(String name) {
         return catMap.get(name);
+    }
+
+    public void refreshCategories() {
+        repo.refreshCategories();
     }
 }

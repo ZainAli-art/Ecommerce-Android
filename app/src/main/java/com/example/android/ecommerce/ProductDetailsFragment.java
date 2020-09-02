@@ -44,7 +44,7 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
     private UserViewModel userViewModel;
 
     private String uid;
-    private String pid;
+    private long pid;
     private String sellerToken;
 
     @Override
@@ -85,13 +85,13 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
         ).get(UserViewModel.class);
 
         Bundle args = getArguments();
-        pid = args.getString(PRODUCT_ID);
-        uid = String.valueOf(userViewModel.getUser().getValue().getUid());
+        pid = args.getLong(PRODUCT_ID);
+        uid = String.valueOf(userViewModel.getUser().getValue().uid);
 
         productViewModel.getProductDetails(pid).observe(getViewLifecycleOwner(), productDetails -> {
             if (productDetails != null) {
                 updateUi(productDetails);
-                sellerToken = productDetails.getSellerToken();
+                sellerToken = productDetails.sellerToken;
             }
         });
     }
@@ -109,14 +109,14 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
     }
 
     private void updateUi(ProductDetails productDetails) {
-        Uri imgUrl = Uri.parse(productDetails.getImgUrl());
+        Uri imgUrl = Uri.parse(productDetails.imgUrl);
         Glide.with(requireContext()).load(imgUrl).into(img);
-        name.setText(productDetails.getProduct());
-        date.setText(productDetails.getDate());
-        category.setText(productDetails.getCategory());
-        price.setText("$ " + productDetails.getPrice());
-        seller.setText(productDetails.getSeller());
-        contact.setText(productDetails.getContact());
+        name.setText(productDetails.product);
+        date.setText(productDetails.date.toString());
+        category.setText(productDetails.category);
+        price.setText("$ " + productDetails.price);
+        seller.setText(productDetails.seller);
+        contact.setText(productDetails.contact);
     }
 
     private void addToCart() {
@@ -131,7 +131,7 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
                 Bundle args = new Bundle();
                 args.putString(ChatFragment.SENDER_TOKEN_KEY, instanceIdResult.getToken());
                 args.putString(ChatFragment.RECEIVER_TOKEN_KEY, sellerToken);
-                args.putString(ChatFragment.PRODUCT_ID_KEY, pid);
+                args.putLong(ChatFragment.PRODUCT_ID_KEY, pid);
 
                 navController.navigate(R.id.action_productDetailsFragment_to_chatFragment, args);
             }

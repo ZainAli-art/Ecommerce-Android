@@ -49,7 +49,7 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(UserViewModel.class);
-        uid = userViewModel.getUser().getValue().getUid();
+        userViewModel.getUser().observe(getViewLifecycleOwner(), user -> uid = user.uid);
 
         cartViewModel.getCartProducts(uid).observe(getViewLifecycleOwner(), adapter::setItems);
     }
@@ -62,7 +62,7 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
     @Override
     public void onClickOrderedProduct(int pos) {
         Bundle args = new Bundle();
-        String oid = String.valueOf(adapter.getItems().get(pos).getOid());
+        String oid = String.valueOf(adapter.getItems().get(pos).oid);
         args.putString(OrderDetailsFragment.ORDER_DETAILS_ID, oid);
         args.putString(OrderDetailsFragment.USER_ID, uid);
 
@@ -71,7 +71,7 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
 
     @Override
     public void onClickDeleteOrderedProduct(int pos) {
-        String oid = String.valueOf(adapter.getItems().get(pos).getOid());
+        long oid = adapter.getItems().get(pos).oid;
         adapter.getItems().remove(pos);
         adapter.notifyItemRemoved(pos);
         cartViewModel.deleteOrder(oid);

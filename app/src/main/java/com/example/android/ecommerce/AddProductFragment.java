@@ -19,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -86,7 +85,7 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
         categoryViewModel.getCategories().observe(requireActivity(), categories -> {
             catSpinnerItems = new String[categories.size()];
             int index = 0;
-            for (Category c : categories) catSpinnerItems[index++] = c.getName();
+            for (Category c : categories) catSpinnerItems[index++] = c.name;
         });
 
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_item, catSpinnerItems);
@@ -129,9 +128,9 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
                 if (bitmap == null) {
                     Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
                 } else {
-                    String uid = userViewModel.getUser().getValue().getUid();
+                    String uid = userViewModel.getUser().getValue().uid;
                     String pName = productName.getText().toString();
-                    String catId = String.valueOf(categoryViewModel.getCatIdByName(catSpinner.getSelectedItem().toString()));
+                    long catId = categoryViewModel.getCatIdByName(catSpinner.getSelectedItem().toString());
                     String img = ByteUtil.BitmapToString(bitmap);
                     String price = priceText.getText().toString();
 

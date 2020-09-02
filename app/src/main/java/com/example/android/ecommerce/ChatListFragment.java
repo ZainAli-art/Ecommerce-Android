@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import com.example.android.ecommerce.adapters.ChatListRecyclerViewAdapter;
 import com.example.android.ecommerce.model.ChatListItem;
 import com.example.android.ecommerce.viewmodel.ChatViewModel;
-import com.google.firebase.iid.FirebaseInstanceId;
 
 public class ChatListFragment extends Fragment implements ChatListRecyclerViewAdapter.ChatListItemListener {
     private NavController navController;
@@ -47,10 +46,11 @@ public class ChatListFragment extends Fragment implements ChatListRecyclerViewAd
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(ChatViewModel.class);
 
-        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(instanceIdResult -> {
-            String token = instanceIdResult.getToken();
-            chatViewModel.getChatListItems(token).observe(getViewLifecycleOwner(), adapter::setItems);
-        });
+//        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(instanceIdResult -> {
+//            String token = instanceIdResult.getToken();
+//            chatViewModel.getChatListItems(token).observe(getViewLifecycleOwner(), adapter::setItems);
+//        });
+        chatViewModel.getChatListItems().observe(getViewLifecycleOwner(), adapter::setItems);
     }
 
     @Override
@@ -58,13 +58,13 @@ public class ChatListFragment extends Fragment implements ChatListRecyclerViewAd
         ChatListItem chatListItem = adapter.getItem(pos);
         String senderToken = chatListItem.getSenderToken();
         String receiverToken = chatListItem.getReceiverToken();
-        String pid = String.valueOf(chatListItem.getPid());
+        long pid = chatListItem.getPid();
 
         Bundle args = new Bundle();
         /* sender and receiver will be reversed in the chat */
         args.putString(ChatFragment.SENDER_TOKEN_KEY, receiverToken);
         args.putString(ChatFragment.RECEIVER_TOKEN_KEY, senderToken);
-        args.putString(ChatFragment.PRODUCT_ID_KEY, pid);
+        args.putLong(ChatFragment.PRODUCT_ID_KEY, pid);
 
         navController.navigate(R.id.action_chatListFragment_to_chatFragment, args);
     }

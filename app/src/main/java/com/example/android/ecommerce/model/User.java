@@ -2,11 +2,29 @@ package com.example.android.ecommerce.model;
 
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.gson.annotations.SerializedName;
+
+@Entity(tableName = "users")
 public class User {
-    private String uid;
-    private String email;
-    private String fullName;
-    private Uri imgUrl;
+    @PrimaryKey
+    @NonNull
+    public String uid;
+
+    public String email;
+
+    @SerializedName("fullname")
+    @ColumnInfo(name = "fullname")
+    public String fullName;
+
+    @SerializedName("img_dir")
+    @ColumnInfo(name = "img_dir")
+    public Uri imgUrl;
 
     public User(String uid, String email, String fullName, Uri imgUrl) {
         this.uid = uid;
@@ -15,19 +33,12 @@ public class User {
         this.imgUrl = imgUrl;
     }
 
-    public String getUid() {
-        return uid;
-    }
+    public static User from(GoogleSignInAccount account) {
+        String uid = account.getId();
+        String email = account.getEmail();
+        String fullName = account.getDisplayName();
+        Uri imgUrl = account.getPhotoUrl();
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public Uri getImgUrl() {
-        return imgUrl;
+        return new User(uid, email, fullName, imgUrl);
     }
 }

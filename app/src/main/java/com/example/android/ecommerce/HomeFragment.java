@@ -12,7 +12,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +29,12 @@ import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
 public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapter.CategoryItemListener,
-        ProductRecyclerViewAdapter.ProductItemListener {
+        ProductRecyclerViewAdapter.ProductItemListener, SwipeRefreshLayout.OnRefreshListener {
+    private static final String TAG = "HomeFragment";
+
     public static final int REQUEST_INTERNET = 1;
     public static final String SELECTED_CAT_ID = "com.example.android.ecommerce.HomeFragment.cat_id";
+    public static final int RECENT_PRODUCTS_LIMIT = 5;
 
     private NavController navController;
     private CategoryViewModel categoryViewModel;
@@ -61,6 +66,9 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         recentProductsAdapter = new ProductRecyclerViewAdapter(Product.HORIZONTAL_TYPE, this);
         recentProductsRecyclerView.setAdapter(recentProductsAdapter);
 
+        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.homeSwipeLayout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
         navController = NavHostFragment.findNavController(this);
         categoryViewModel = new ViewModelProvider(
                 requireActivity(),
@@ -75,8 +83,7 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(ProductViewModel.class);
 
-        // check if any user was previously logged in
-        userViewModel.signInLastSignedInUser();
+//        userViewModel.signInLastSignedInUser();
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             if (internetPermissionGranted() &&
@@ -87,9 +94,13 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         categoryViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
             if (internetPermissionGranted()) {
                 categoryAdapter.setItems(categories);
+                if (categories != null) {
+                    for (Category c : categories)
+                        Log.d(TAG, "onViewCreated: catImgDir: " + c.imgUrl);
+                }
             }
         });
-        productViewModel.getRecentProducts().observe(getViewLifecycleOwner(), recentProducts -> {
+        productViewModel.getRecentProducts(RECENT_PRODUCTS_LIMIT).observe(getViewLifecycleOwner(), recentProducts -> {
             if (internetPermissionGranted()) {
                 recentProductsAdapter.setItems(recentProducts);
             }
@@ -100,9 +111,9 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
 
     @Override
     public void onClickCategory(int pos) {
-        String catId = String.valueOf(categoryAdapter.getItem(pos).getId());
+        long catId = categoryAdapter.getItem(pos).id;
         Bundle args = new Bundle();
-        args.putString(SELECTED_CAT_ID, catId);
+        args.putLong(SELECTED_CAT_ID, catId);
 
         navController.navigate(R.id.action_homeFragment_to_productListFragment, args);
     }
@@ -110,10 +121,15 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
     @Override
     public void onClickProduct(int pos) {
         Bundle args = new Bundle();
-        String pid = String.valueOf(recentProductsAdapter.getItem(pos).getPid());
-        args.putString(ProductDetailsFragment.PRODUCT_ID, pid);
+        long pid = recentProductsAdapter.getItem(pos).pid;
+        args.putLong(ProductDetailsFragment.PRODUCT_ID, pid);
 
         navController.navigate(R.id.action_homeFragment_to_productDetailsFragment, args);
+    }
+
+    @Override
+    public void onRefresh() {
+        productViewModel.refreshProducts();
     }
 
     private boolean internetPermissionGranted() {

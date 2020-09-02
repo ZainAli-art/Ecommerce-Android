@@ -1,37 +1,40 @@
 package com.example.android.ecommerce.model;
 
-public class Chat {
-    private String senderToken;
-    private String receiverToken;
-    private long pid;
-    private String msg;
-    private String time;
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
 
-    public Chat(String senderToken, String receiverToken, long pid, String msg, String time) {
+import com.google.gson.annotations.SerializedName;
+
+import java.sql.Timestamp;
+
+@Entity(tableName = "chats", primaryKeys = {"sender_token", "receiver_token", "upload_time"})
+public class Chat {
+    @SerializedName("sender_token")
+    @ColumnInfo(name = "sender_token")
+    @NonNull
+    public String senderToken;
+
+    @SerializedName("receiver_token")
+    @ColumnInfo(name = "receiver_token")
+    @NonNull
+    public String receiverToken;
+
+    @ColumnInfo(name = "pid")
+    public long pid;
+
+    public String msg;
+
+    @SerializedName("upload_time")
+    @ColumnInfo(name = "upload_time")
+    @NonNull
+    public Timestamp time;
+
+    public Chat(String senderToken, String receiverToken, long pid, String msg, Timestamp time) {
         this.senderToken = senderToken;
         this.receiverToken = receiverToken;
         this.pid = pid;
         this.msg = msg;
         this.time = time;
-    }
-
-    public String getSenderToken() {
-        return senderToken;
-    }
-
-    public String getReceiverToken() {
-        return receiverToken;
-    }
-
-    public long getPid() {
-        return pid;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public String getTime() {
-        return time;
     }
 }

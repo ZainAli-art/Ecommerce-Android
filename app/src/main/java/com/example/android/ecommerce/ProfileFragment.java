@@ -64,11 +64,11 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     navController.navigate(R.id.homeFragment, null, options);
                 }
             } else {
-                Uri imgUrl = user.getImgUrl();
+                Uri imgUrl = user.imgUrl;
                 if (imgUrl != null)
                     Glide.with(ProfileFragment.this).load(imgUrl).into(profileImg);
-                fullName.setText(user.getFullName());
-                email.setText(user.getEmail());
+                fullName.setText(user.fullName);
+                email.setText(user.email);
             }
         });
     }

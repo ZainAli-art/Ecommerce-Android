@@ -43,13 +43,13 @@ public class ChatRecyclerViewAdapter extends RecyclerView.Adapter<ChatRecyclerVi
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
         Chat chat = chatList.get(position);
 
-        holder.setMsg(chat.getMsg());
+        holder.setMsg(chat.msg);
 
-        if (chat.getSenderToken().equals(senderToken)) {
+        if (chat.senderToken.equals(senderToken)) {
             Log.d(TAG, "onBindViewHolder: id matches");
 
             holder.setBackgroundColor(Color.parseColor("#0099ff"));
-            holder.setGravity(Gravity.RIGHT);
+            holder.setGravity(Gravity.END);
         } else {
             Log.d(TAG, "onBindViewHolder: id does not match");
 

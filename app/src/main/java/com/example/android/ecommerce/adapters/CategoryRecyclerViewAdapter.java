@@ -18,6 +18,8 @@ import com.example.android.ecommerce.model.Category;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.android.ecommerce.utils.Constants.BASE_URL;
+
 public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRecyclerViewAdapter.CatViewHolder>
         implements ECommerceRecyclerViewAdaptable<Category> {
     private List<Category> categories;
@@ -50,8 +52,8 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
     @Override
     public void onBindViewHolder(@NonNull CatViewHolder holder, int position) {
         Category category = categories.get(position);
-        holder.setImage(category.getImgUrl());
-        holder.setText(category.getName());
+        holder.setImage(category.imgUrl);
+        holder.setText(category.name);
     }
 
     @Override
@@ -92,7 +94,7 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
         }
 
         public void setImage(String imgUrl) {
-            Glide.with(mContext).load(imgUrl).into(catImage);
+            Glide.with(mContext).load(BASE_URL + imgUrl).into(catImage);
         }
 
         public void setText(CharSequence text) {

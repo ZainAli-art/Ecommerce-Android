@@ -18,6 +18,8 @@ import com.example.android.ecommerce.model.Product;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.android.ecommerce.utils.Constants.BASE_URL;
+
 public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecyclerViewAdapter.PViewHolder>
         implements ECommerceRecyclerViewAdaptable<Product> {
     private List<Product> products;
@@ -54,8 +56,8 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
     @Override
     public void onBindViewHolder(@NonNull PViewHolder holder, int position) {
         Product product = products.get(position);
-        holder.setImage(product.getImgUrl());
-        holder.setText(product.getName());
+        holder.setImage(product.imgUrl);
+        holder.setText(product.name);
     }
 
     @Override
@@ -96,7 +98,7 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
         }
 
         public void setImage(String imgUrl) {
-            Glide.with(mContext).load(imgUrl).into(pImage);
+            Glide.with(mContext).load(BASE_URL + imgUrl).into(pImage);
         }
 
         public void setText(CharSequence text) {
