@@ -108,7 +108,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String body = remoteMessage.getNotification().getBody();
         String senderToken = remoteMessage.getData().get("sender_token");
         String receiverToken = remoteMessage.getData().get("receiver_token");
-        String pid = remoteMessage.getData().get("pid");
+        long pid = Long.parseLong(remoteMessage.getData().get("pid"));
 
         // --- trigger broadcast to refresh chat ---
         Intent intent = new Intent(MainActivity.ACTION_REFRESH_CHAT);
@@ -123,7 +123,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         /* sender and receiver will be reversed in the chat */
         args.putString(ChatFragment.SENDER_TOKEN_KEY, receiverToken);
         args.putString(ChatFragment.RECEIVER_TOKEN_KEY, senderToken);
-        args.putString(ChatFragment.PRODUCT_ID_KEY, pid);
+        args.putLong(ChatFragment.PRODUCT_ID_KEY, pid);
 
         // create pending intent for the notification
         PendingIntent pendingIntent = new NavDeepLinkBuilder(this)

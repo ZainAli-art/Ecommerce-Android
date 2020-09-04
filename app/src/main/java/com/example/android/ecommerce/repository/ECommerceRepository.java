@@ -172,7 +172,8 @@ public class ECommerceRepository implements SignInListener {
     public void insertChat(String senderToken, String receiverToken, long pid, String msg) {
         executor.execute(() -> {
             try {
-                webservice.insertChat(senderToken, receiverToken, pid, msg).execute();
+                List<Chat> chats = webservice.insertChat(senderToken, receiverToken, pid, msg).execute().body();
+                chatDao.insertChats(chats);
             } catch (IOException e) {
                 e.printStackTrace();
             }

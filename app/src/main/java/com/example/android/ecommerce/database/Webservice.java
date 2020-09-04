@@ -23,27 +23,27 @@ import retrofit2.http.Query;
 public interface Webservice {
     @FormUrlEncoded
     @POST("scripts/user/add-user.php")
-    Call<User> insertUser(@Field("uid") String uid, @Field("email") String email, @Field("full_name") String fullName, @Field("img_dir") String imgUrl);
+    Call<Void> insertUser(@Field("uid") String uid, @Field("email") String email, @Field("full_name") String fullName, @Field("img_dir") String imgUrl);
 
     @FormUrlEncoded
     @POST("scripts/product/upload-product.php")
-    Call<Product> insertProduct(@Field("uid") String uid, @Field("pname") String pName, @Field("cat_id") long catId, @Field("image") String img, @Field("price") String price);
+    Call<Void> insertProduct(@Field("uid") String uid, @Field("pname") String pName, @Field("cat_id") long catId, @Field("image") String img, @Field("price") String price);
 
     @FormUrlEncoded
     @POST("scripts/order/add-order.php")
-    Call<Order> insertOrder(@Field("uid") String uid, @Field("pid") long pid);
+    Call<Void> insertOrder(@Field("uid") String uid, @Field("pid") long pid);
 
     @FormUrlEncoded
-    @POST("scripts/chat/send-new-msg.php")
-    Call<Chat> insertChat(@Field("sender_token") String senderToken, @Field("receiver_token") String receiverToken, @Field("pid") long pid, @Field("msg") String msg);
+    @POST("scripts/chat/insert-and-print-chat-json.php")
+    Call<List<Chat>> insertChat(@Field("sender_token") String senderToken, @Field("receiver_token") String receiverToken, @Field("pid") long pid, @Field("msg") String msg);
 
     @FormUrlEncoded
     @POST("scripts/fcm/register-user-fcm-token.php")
-    Call<Fcm> insertFcmToken(@Field("token") String token, @Field("uid") String uid);
+    Call<Void> insertFcmToken(@Field("token") String token, @Field("uid") String uid);
 
     @FormUrlEncoded
     @POST("scripts/fcm/add-fcm-token.php")
-    Call<Fcm> insertFcmToken(@Field("fcm_token") String token);
+    Call<Void> insertFcmToken(@Field("fcm_token") String token);
 
     @GET("scripts/category/all-categories-json.php")
     Call<List<Category>> getCategories();

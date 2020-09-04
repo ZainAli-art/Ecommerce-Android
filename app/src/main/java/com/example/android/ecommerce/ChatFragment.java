@@ -27,6 +27,7 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
 
     private EditText msgEditText;
     private ChatViewModel chatViewModel;
+    private ChatRecyclerViewAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,12 +56,15 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
         super.onViewCreated(view, savedInstanceState);
 
         RecyclerView chatRecyclerView = view.findViewById(R.id.chatRecyclerView);
-        ChatRecyclerViewAdapter adapter = new ChatRecyclerViewAdapter(senderToken);
+        adapter = new ChatRecyclerViewAdapter(senderToken);
         chatRecyclerView.setAdapter(adapter);
         msgEditText = view.findViewById(R.id.msgEditText);
         view.findViewById(R.id.sendMsgBtn).setOnClickListener(this);
 
-        chatViewModel.getChats(senderToken, receiverToken, pid).observe(getViewLifecycleOwner(), adapter::setItems);
+        chatViewModel.getChats(senderToken, receiverToken, pid).observe(getViewLifecycleOwner(), chats -> {
+            adapter.setItems(chats);
+            chatRecyclerView.smoothScrollToPosition(chats.size());
+        });
     }
 
     @Override
