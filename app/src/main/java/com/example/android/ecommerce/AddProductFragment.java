@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -40,16 +40,16 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
     public static final int REQUEST_PERMISSION_READ_EXTERNAL = 1;
     public static final int REQUEST_IMAGE = 2;
 
-    private ImageView productImgView;
-    private EditText productName;
-    private Spinner catSpinner;
-    private EditText priceText;
-
     private NavController navController;
 
     private CategoryViewModel categoryViewModel;
     private ProductViewModel productViewModel;
     private UserViewModel userViewModel;
+
+    private ImageView productImgView;
+    private EditText productName;
+    private Spinner catSpinner;
+    private EditText priceText;
 
 
     private Bitmap bitmap;
@@ -62,20 +62,11 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add_product, container, false);
-    }
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        navController = Navigation.findNavController(view);
-        productImgView = view.findViewById(R.id.productImgView);
-        productName = view.findViewById(R.id.productName);
-        priceText = view.findViewById(R.id.price);
-        view.findViewById(R.id.uploadProductBtn).setOnClickListener(this);
+        navController = NavHostFragment.findNavController(this);
+
         userViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -88,6 +79,22 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(ProductViewModel.class);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_add_product, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        productImgView = view.findViewById(R.id.productImgView);
+        productName = view.findViewById(R.id.productName);
+        priceText = view.findViewById(R.id.price);
+        view.findViewById(R.id.uploadProductBtn).setOnClickListener(this);
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> uid = user.uid);
 
@@ -105,7 +112,6 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
             catSpinner = view.findViewById(R.id.catSpinner);
             catSpinner.setAdapter(spinnerAdapter);
         });
-
 
         requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_READ_EXTERNAL);
     }

@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.android.ecommerce.model.Fcm;
-import com.example.android.ecommerce.utils.NavigationUtils;
 import com.example.android.ecommerce.viewmodel.FcmViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 import com.facebook.FacebookCallback;
@@ -40,10 +39,29 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
 
     private static final int RC_SIGN_IN = 1;
 
+    private NavController navController;
+
     private UserViewModel userViewModel;
+    private FcmViewModel fcmViewModel;
 
     public SignInFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
+
+        userViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication()))
+                .get(UserViewModel.class);
+        fcmViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication()))
+                .get(FcmViewModel.class);
     }
 
     @Override
@@ -59,15 +77,6 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
         // initialize components
         SignInButton googleSignInButton = view.findViewById(R.id.googleSignInBtn);
         LoginButton facebookLoginBtn = view.findViewById(R.id.facebookLoginBtn);
-        userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication()))
-                .get(UserViewModel.class);
-        FcmViewModel fcmViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication()))
-                .get(FcmViewModel.class);
-        NavController navController = NavHostFragment.findNavController(this);
 
         googleSignInButton.setOnClickListener(this);
         facebookLoginBtn.setPermissions(Arrays.asList("email", "public_profile"));
@@ -90,7 +99,7 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
         facebookLoginBtn.setOnClickListener(this);
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
-            if (user != null && NavigationUtils.isValidInContext(navController, R.id.signInFragment)) {
+            if (user != null) {
                 navController.popBackStack();
 
                 FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {

@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.android.ecommerce.utils.NavigationUtils;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
@@ -29,6 +27,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     public ProfileFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
+
+        userViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(UserViewModel.class);
     }
 
     @Override
@@ -42,27 +52,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(UserViewModel.class);
-        navController = Navigation.findNavController(view);
         ImageView profileImg = view.findViewById(R.id.profileImg);
         TextView fullName = view.findViewById(R.id.fullName);
         TextView email = view.findViewById(R.id.email);
         Button signOutBtn = view.findViewById(R.id.signOutBtn);
         signOutBtn.setOnClickListener(this);
-        NavController navController = NavHostFragment.findNavController(this);
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             if (user == null) {
-                if (NavigationUtils.isValidInContext(navController, R.id.profileFragment)) {
-                    NavHostFragment.findNavController(this).popBackStack();
-                    NavOptions options = new NavOptions.Builder()
-                            .setPopUpTo(R.id.homeFragment, true)
-                            .build();
-                    navController.navigate(R.id.homeFragment, null, options);
-                }
+                NavOptions options = new NavOptions.Builder()
+                        .setPopUpTo(R.id.homeFragment, true)
+                        .build();
+                navController.navigate(R.id.homeFragment, null, options);
             } else {
                 Uri imgUrl = user.imgUrl;
                 if (imgUrl != null)

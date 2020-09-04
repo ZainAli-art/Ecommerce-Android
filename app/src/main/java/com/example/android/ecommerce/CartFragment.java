@@ -25,10 +25,28 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
     private static final String TAG = "CartFragment";
 
     private NavController navController;
+
     private CartViewModel cartViewModel;
+    private UserViewModel userViewModel;
 
     private String uid;
     private OrderedProductRecyclerViewAdapter adapter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
+
+        cartViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(CartViewModel.class);
+        userViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(UserViewModel.class);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,29 +58,20 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        navController = NavHostFragment.findNavController(this);
 
-        SwipeRefreshLayout refreshCartLayout = view.findViewById(R.id.refreshCartLayout);
-        refreshCartLayout.setOnRefreshListener(this);
+        SwipeRefreshLayout cartSwipeRefreshLayout = view.findViewById(R.id.cartSwipeRefreshLayout);
+        cartSwipeRefreshLayout.setOnRefreshListener(this);
 
         RecyclerView cartRecyclerView = view.findViewById(R.id.cartRecyclerView);
         adapter = new OrderedProductRecyclerViewAdapter(this);
         cartRecyclerView.setAdapter(adapter);
 
-        cartViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(CartViewModel.class);
-        UserViewModel userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(UserViewModel.class);
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             uid = user.uid;
             Log.d(TAG, "onViewCreated uid: " + uid);
             cartViewModel.getCartProducts(uid).observe(getViewLifecycleOwner(), cartProducts -> {
                 adapter.setItems(cartProducts);
-                refreshCartLayout.setRefreshing(false);
+                cartSwipeRefreshLayout.setRefreshing(false);
             });
         });
     }

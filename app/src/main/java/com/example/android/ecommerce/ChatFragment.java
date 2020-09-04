@@ -29,6 +29,21 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     private ChatViewModel chatViewModel;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        senderToken = args.getString(SENDER_TOKEN_KEY);
+        receiverToken = args.getString(RECEIVER_TOKEN_KEY);
+        pid = args.getLong(PRODUCT_ID_KEY);
+
+        chatViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(ChatViewModel.class);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -39,21 +54,11 @@ public class ChatFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Bundle args = getArguments();
-        senderToken = args.getString(SENDER_TOKEN_KEY);
-        receiverToken = args.getString(RECEIVER_TOKEN_KEY);
-        pid = args.getLong(PRODUCT_ID_KEY);
-
         RecyclerView chatRecyclerView = view.findViewById(R.id.chatRecyclerView);
         ChatRecyclerViewAdapter adapter = new ChatRecyclerViewAdapter(senderToken);
         chatRecyclerView.setAdapter(adapter);
         msgEditText = view.findViewById(R.id.msgEditText);
         view.findViewById(R.id.sendMsgBtn).setOnClickListener(this);
-
-        chatViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(ChatViewModel.class);
 
         chatViewModel.getChats(senderToken, receiverToken, pid).observe(getViewLifecycleOwner(), adapter::setItems);
     }

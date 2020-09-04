@@ -14,7 +14,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,17 +22,14 @@ import com.example.android.ecommerce.adapters.CategoryRecyclerViewAdapter;
 import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
 import com.example.android.ecommerce.model.Category;
 import com.example.android.ecommerce.model.Product;
-import com.example.android.ecommerce.utils.NavigationUtils;
 import com.example.android.ecommerce.viewmodel.CategoryViewModel;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
 public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapter.CategoryItemListener,
         ProductRecyclerViewAdapter.ProductItemListener, SwipeRefreshLayout.OnRefreshListener {
-    private static final String TAG = "HomeFragment";
-
+    public static final String SELECTED_CAT_ID = "SELECTED_CAT_ID";
     public static final int REQUEST_INTERNET = 1;
-    public static final String SELECTED_CAT_ID = "com.example.android.ecommerce.HomeFragment.cat_id";
     public static final int RECENT_PRODUCTS_LIMIT = 5;
 
     private NavController navController;
@@ -47,6 +43,26 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
 
     public HomeFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
+
+        categoryViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(CategoryViewModel.class);
+        userViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(UserViewModel.class);
+        productViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(ProductViewModel.class);
     }
 
     @Override
@@ -68,44 +84,25 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         recentProductsAdapter = new ProductRecyclerViewAdapter(Product.HORIZONTAL_TYPE, this);
         recentProductsRecyclerView.setAdapter(recentProductsAdapter);
 
-        SwipeRefreshLayout homeSwipeLayout = view.findViewById(R.id.homeSwipeLayout);
-        homeSwipeLayout.setOnRefreshListener(this);
-
-        navController = NavHostFragment.findNavController(this);
-        categoryViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(CategoryViewModel.class);
-        userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(UserViewModel.class);
-        productViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(ProductViewModel.class);
+        SwipeRefreshLayout homeSwipeRefreshLayout = view.findViewById(R.id.homeSwipeRefreshLayout);
+        homeSwipeRefreshLayout.setOnRefreshListener(this);
 
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
-            if (internetPermissionGranted() &&
-                    user == null && NavigationUtils.isValidInContext(navController, R.id.homeFragment)) {
+            if (user == null) {
                 navController.navigate(R.id.action_homeFragment_to_signInFragment);
-            } else if (user != null) {
+            } else {
                 uid = user.uid;
             }
         });
         categoryViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
             if (internetPermissionGranted()) {
                 categoryAdapter.setItems(categories);
-                if (categories != null) {
-                    for (Category c : categories)
-                        Log.d(TAG, "onViewCreated: catImgDir: " + c.imgUrl);
-                }
             }
         });
         productViewModel.getRecentProducts(RECENT_PRODUCTS_LIMIT).observe(getViewLifecycleOwner(), recentProducts -> {
             if (internetPermissionGranted()) {
                 recentProductsAdapter.setItems(recentProducts);
-                homeSwipeLayout.setRefreshing(false);
+                homeSwipeRefreshLayout.setRefreshing(false);
             }
         });
 

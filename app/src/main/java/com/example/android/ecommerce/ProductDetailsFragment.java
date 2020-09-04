@@ -55,6 +55,17 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
         Bundle args = getArguments();
         pid = args.getLong(PRODUCT_ID);
         uid = args.getString(USER_ID);
+
+        navController = NavHostFragment.findNavController(this);
+
+        productViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(ProductViewModel.class);
+        cartViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(CartViewModel.class);
     }
 
     @Override
@@ -68,8 +79,6 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        navController = NavHostFragment.findNavController(this);
-
         img = view.findViewById(R.id.img);
         name = view.findViewById(R.id.name);
         date = view.findViewById(R.id.date);
@@ -80,15 +89,6 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
         Button addToCartBtn = view.findViewById(R.id.addToCartBtn);
         addToCartBtn.setOnClickListener(this);
         view.findViewById(R.id.chatSellerButton).setOnClickListener(this);
-
-        productViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(ProductViewModel.class);
-        cartViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(CartViewModel.class);
 
         productViewModel.getProductDetails(pid).observe(getViewLifecycleOwner(), productDetails -> {
             if (productDetails != null) {

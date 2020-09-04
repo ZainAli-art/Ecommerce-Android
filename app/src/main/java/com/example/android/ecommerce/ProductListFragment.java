@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
 import com.example.android.ecommerce.model.Product;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
@@ -20,9 +21,26 @@ import com.example.android.ecommerce.viewmodel.ProductViewModel;
 public class ProductListFragment extends Fragment implements ProductRecyclerViewAdapter.ProductItemListener {
     private NavController navController;
     private ProductRecyclerViewAdapter adapter;
+    private long catId;
+    private ProductViewModel productViewModel;
 
     public ProductListFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        catId = args.getLong(HomeFragment.SELECTED_CAT_ID);
+
+        navController = NavHostFragment.findNavController(this);
+
+        productViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(ProductViewModel.class);
     }
 
     @Override
@@ -36,16 +54,9 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        navController = NavHostFragment.findNavController(this);
         RecyclerView productListRecyclerView = view.findViewById(R.id.productListRecyclerView);
         adapter = new ProductRecyclerViewAdapter(Product.VERTICAL_TYPE, this);
         productListRecyclerView.setAdapter(adapter);
-        ProductViewModel productViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(ProductViewModel.class);
-        Bundle args = getArguments();
-        long catId = args.getLong(HomeFragment.SELECTED_CAT_ID);
 
         // observers
         productViewModel.getProducts(catId).observe(getViewLifecycleOwner(), products -> {

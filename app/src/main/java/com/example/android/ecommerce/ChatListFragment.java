@@ -25,6 +25,18 @@ public class ChatListFragment extends Fragment implements ChatListRecyclerViewAd
     private ChatListRecyclerViewAdapter adapter;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
+
+        chatViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(ChatViewModel.class);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -35,16 +47,9 @@ public class ChatListFragment extends Fragment implements ChatListRecyclerViewAd
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        navController = NavHostFragment.findNavController(this);
-
         chatListRecyclerView = view.findViewById(R.id.chatListRecyclerView);
         adapter = new ChatListRecyclerViewAdapter(this);
         chatListRecyclerView.setAdapter(adapter);
-
-        chatViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(ChatViewModel.class);
 
 //        FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(instanceIdResult -> {
 //            String token = instanceIdResult.getToken();

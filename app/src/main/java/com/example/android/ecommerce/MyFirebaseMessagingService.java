@@ -12,12 +12,10 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavDeepLinkBuilder;
 
 import com.bumptech.glide.Glide;
-import com.example.android.ecommerce.repository.ECommerceRepository;
 import com.example.android.ecommerce.viewmodel.FcmViewModel;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -28,9 +26,6 @@ import java.util.concurrent.ExecutionException;
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "MyFirebaseMessagingServ";
 
-    //    public static final String BASE_URL = HOST_URL + "scripts/fcm/";
-//    public static final String UPDATE_FCM_TOKEN_URL = BASE_URL + "update-fcm-token.php";
-//    public static final String ADD_FCM_TOKEN_URL = BASE_URL + "add-fcm-token.php";
     public static final int RECENT_PRODUCT_NOTIFCICATION_ID = 1;
     public static final int CHAT_NOTIFICATION_ID = 2;
     public static final String OLD_TOKEN_KEY = "MyFirebaseMessagingService.OLD_TOKEN";
@@ -46,13 +41,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String oldToken = preferences.getString(OLD_TOKEN_KEY, null);
         preferences.edit().putString(OLD_TOKEN_KEY, s).apply();
 
-//        ECommerceRepository repo = ECommerceRepository.getInstance(getApplication());
         FcmViewModel fcmViewModel = new FcmViewModel(getApplication());
         if (oldToken == null) {
-//            addNewTokenOnServer(s);
             fcmViewModel.insert(s);
         } else {
-//            updateTokenOnServer(oldToken, s);
             fcmViewModel.update(oldToken, s);
         }
     }
@@ -77,50 +69,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 break;
         }
     }
-
-//    private void updateTokenOnServer(String oldToken, String newToken) {
-//        StringRequest request = new StringRequest(
-//                Request.Method.POST,
-//                UPDATE_FCM_TOKEN_URL,
-//                response -> {
-//                    Log.d(TAG, "updateTokenOnServer response: " + response);
-//                },
-//                error -> {
-//                }
-//        ) {
-//            @Override
-//            protected Map<String, String> getParams() throws AuthFailureError {
-//                Map<String, String> params = new HashMap<>();
-//                params.put("old_token", oldToken);
-//                params.put("new_token", newToken);
-//                return params;
-//            }
-//        };
-//
-//        MySingleton.getInstance(this).enqueueRequest(request);
-//    }
-//
-//    private void addNewTokenOnServer(String token) {
-//        StringRequest request = new StringRequest(
-//                Request.Method.POST,
-//                ADD_FCM_TOKEN_URL,
-//                response -> {
-//                    Log.d(TAG, "addNewTokenOnServer response: " + response);
-//                },
-//                error -> {
-//                    error.printStackTrace();
-//                }
-//        ) {
-//            @Override
-//            protected Map<String, String> getParams() throws AuthFailureError {
-//                Map<String, String> params = new HashMap<>();
-//                params.put("fcm_token", token);
-//                return params;
-//            }
-//        };
-//
-//        MySingleton.getInstance(this).enqueueRequest(request);
-//    }
 
     public void notifyRecentProduct(RemoteMessage remoteMessage) {
         String title = remoteMessage.getNotification().getTitle();
@@ -176,10 +124,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         args.putString(ChatFragment.SENDER_TOKEN_KEY, receiverToken);
         args.putString(ChatFragment.RECEIVER_TOKEN_KEY, senderToken);
         args.putString(ChatFragment.PRODUCT_ID_KEY, pid);
-
-//        intent = new Intent(this, MainActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT, args);
 
         // create pending intent for the notification
         PendingIntent pendingIntent = new NavDeepLinkBuilder(this)

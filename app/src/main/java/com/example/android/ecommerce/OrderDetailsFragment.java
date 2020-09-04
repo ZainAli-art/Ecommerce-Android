@@ -43,6 +43,13 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
         Bundle args = getArguments();
         oid = args.getLong(ORDER_DETAILS_ID);
         uid = args.getString(USER_ID);
+
+        navController = NavHostFragment.findNavController(this);
+
+        cartViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
+        ).get(CartViewModel.class);
     }
 
     @Override
@@ -55,13 +62,6 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        navController = NavHostFragment.findNavController(this);
-
-        cartViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(CartViewModel.class);
 
         img = view.findViewById(R.id.img);
         productName = view.findViewById(R.id.productName);
