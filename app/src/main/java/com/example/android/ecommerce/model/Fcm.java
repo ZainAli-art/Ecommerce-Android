@@ -16,4 +16,12 @@ public class Fcm {
         this.token = token;
         this.uid = uid;
     }
+
+    @Override
+    public String toString() {
+        return "Fcm{" +
+                "token='" + token + '\'' +
+                ", uid='" + uid + '\'' +
+                '}';
+    }
 }

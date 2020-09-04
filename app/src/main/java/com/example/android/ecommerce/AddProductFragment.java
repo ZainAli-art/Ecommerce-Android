@@ -10,6 +10,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -32,6 +33,8 @@ import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AddProductFragment extends Fragment implements View.OnClickListener {
     public static final int REQUEST_PERMISSION_READ_EXTERNAL = 1;
@@ -41,13 +44,18 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
     private EditText productName;
     private Spinner catSpinner;
     private EditText priceText;
+
     private NavController navController;
+
     private CategoryViewModel categoryViewModel;
     private ProductViewModel productViewModel;
+    private UserViewModel userViewModel;
+
 
     private Bitmap bitmap;
-    String[] catSpinnerItems;
-    private UserViewModel userViewModel;
+    private String[] catSpinnerItems;
+    private String uid;
+    private Map<String, Long> catMap;
 
     public AddProductFragment() {
         // Required empty public constructor
@@ -81,17 +89,23 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(ProductViewModel.class);
 
+        userViewModel.getUser().observe(getViewLifecycleOwner(), user -> uid = user.uid);
 
-        categoryViewModel.getCategories().observe(requireActivity(), categories -> {
+        categoryViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
             catSpinnerItems = new String[categories.size()];
+            catMap = new HashMap<>();
             int index = 0;
-            for (Category c : categories) catSpinnerItems[index++] = c.name;
+            for (Category c : categories) {
+                catSpinnerItems[index++] = c.name;
+                catMap.put(c.name, c.id);
+            }
+
+            ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_item, catSpinnerItems);
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            catSpinner = view.findViewById(R.id.catSpinner);
+            catSpinner.setAdapter(spinnerAdapter);
         });
 
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_item, catSpinnerItems);
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        catSpinner = view.findViewById(R.id.catSpinner);
-        catSpinner.setAdapter(spinnerAdapter);
 
         requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_PERMISSION_READ_EXTERNAL);
     }
@@ -110,11 +124,11 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE && resultCode == requireActivity().RESULT_OK) {
+        if (requestCode == REQUEST_IMAGE && resultCode == FragmentActivity.RESULT_OK) {
             Uri imgUri = data.getData();
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), imgUri);
-                Glide.with(getContext()).load(bitmap).into(productImgView);
+                Glide.with(requireContext()).load(bitmap).into(productImgView);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -128,9 +142,9 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
                 if (bitmap == null) {
                     Toast.makeText(getContext(), "No image selected", Toast.LENGTH_SHORT).show();
                 } else {
-                    String uid = userViewModel.getUser().getValue().uid;
+                    String catName = catSpinner.getSelectedItem().toString();
                     String pName = productName.getText().toString();
-                    long catId = categoryViewModel.getCatIdByName(catSpinner.getSelectedItem().toString());
+                    long catId = catMap.get(catName);
                     String img = ByteUtil.BitmapToString(bitmap);
                     String price = priceText.getText().toString();
 

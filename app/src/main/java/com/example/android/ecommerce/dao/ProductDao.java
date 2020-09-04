@@ -19,26 +19,18 @@ public interface ProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertProducts(List<Product> products);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertProductDetails(ProductDetails details);
+
     @Query("SELECT * FROM products WHERE cat_id = :catId")
     LiveData<List<Product>> loadProducts(long catId);
 
     @Query("SELECT * FROM products ORDER BY upload_time DESC LIMIT :limit")
     LiveData<List<Product>> loadRecentProducts(int limit);
 
-    @Query("SELECT " +
-                "pid, " +
-                "u.uid as seller_id, " +
-                "p.pname AS product, " +
-                "cat_name AS category, " +
-                "p.img_dir AS img_dir, " +
-                "upload_time, price, " +
-                "fullname as seller, " +
-                "email as contact, " +
-                "token as seller_token " +
-            "FROM users u " +
-            "JOIN fcm ON u.uid = fcm.uid " +
-            "JOIN products p ON u.uid = p.uid " +
-            "JOIN categories c ON p.cat_id = c.cat_id " +
-            "WHERE pid = :pid")
+    @Query("SELECT * FROM product_details WHERE pid = :pid")
     LiveData<ProductDetails> loadProductDetails(long pid);
+
+    @Query("SELECT * FROM product_details WHERE pid = :pid")
+    ProductDetails getProductDetails(long pid);
 }

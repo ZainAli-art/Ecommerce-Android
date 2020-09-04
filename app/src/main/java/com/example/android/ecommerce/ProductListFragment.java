@@ -17,8 +17,6 @@ import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
 import com.example.android.ecommerce.model.Product;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
 
-import java.util.List;
-
 public class ProductListFragment extends Fragment implements ProductRecyclerViewAdapter.ProductItemListener {
     private NavController navController;
     private ProductRecyclerViewAdapter adapter;
@@ -57,10 +55,6 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
 
     @Override
     public void onClickProduct(int pos) {
-        Bundle args = new Bundle();
-        String pid = String.valueOf(adapter.getItem(pos).pid);
-        args.putString(ProductDetailsFragment.PRODUCT_ID, pid);
-
-        navController.navigate(R.id.action_productListFragment_to_productDetailsFragment, args);
+        navController.navigate(R.id.action_productListFragment_to_productDetailsFragment, getArguments());
     }
 }

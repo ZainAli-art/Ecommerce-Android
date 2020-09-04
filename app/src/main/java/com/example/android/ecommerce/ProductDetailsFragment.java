@@ -21,13 +21,15 @@ import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.model.ProductDetails;
 import com.example.android.ecommerce.viewmodel.CartViewModel;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
-import com.example.android.ecommerce.viewmodel.UserViewModel;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
 public class ProductDetailsFragment extends Fragment implements View.OnClickListener {
-    public static final String PRODUCT_ID = "productId";
+    private static final String TAG = "ProductDetailsFragment";
+
+    public static final String PRODUCT_ID = "PRODUCT_ID";
+    public static final String USER_ID = "USER_ID";
 
     private NavController navController;
 
@@ -41,11 +43,19 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
 
     private ProductViewModel productViewModel;
     private CartViewModel cartViewModel;
-    private UserViewModel userViewModel;
 
     private String uid;
     private long pid;
     private String sellerToken;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        pid = args.getLong(PRODUCT_ID);
+        uid = args.getString(USER_ID);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,14 +89,6 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(CartViewModel.class);
-        userViewModel = new ViewModelProvider(
-                requireActivity(),
-                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
-        ).get(UserViewModel.class);
-
-        Bundle args = getArguments();
-        pid = args.getLong(PRODUCT_ID);
-        uid = String.valueOf(userViewModel.getUser().getValue().uid);
 
         productViewModel.getProductDetails(pid).observe(getViewLifecycleOwner(), productDetails -> {
             if (productDetails != null) {
@@ -121,6 +123,7 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
 
     private void addToCart() {
         cartViewModel.addToCart(uid, pid);
+        cartViewModel.refreshCart(uid);
         navController.popBackStack();
     }
 

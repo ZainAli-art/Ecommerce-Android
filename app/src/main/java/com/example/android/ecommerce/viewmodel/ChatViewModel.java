@@ -28,7 +28,11 @@ public class ChatViewModel extends AndroidViewModel {
         return repo.getChatListItems();
     }
 
+    public void refreshChats(String senderToken, String receiverToken, long pid) {
+        repo.refreshChats(senderToken, receiverToken, pid);
+    }
+
     public void sendMsg(String senderToken, String receiverToken, long pid, String msg) {
-        repo.sendMsg(senderToken, receiverToken, pid, msg);
+        repo.insertChat(senderToken, receiverToken, pid, msg);
     }
 }

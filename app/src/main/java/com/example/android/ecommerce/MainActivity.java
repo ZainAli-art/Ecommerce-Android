@@ -13,15 +13,12 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
 
-import com.example.android.ecommerce.viewmodel.ChatViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
     private static final String BROADCAST_PACKAGE = "com.example.android.broadcast";
     public static final String ACTION_REFRESH_CHAT = BROADCAST_PACKAGE + ".ACTION_REFRESH_CHAT";
-
-    private ChatViewModel chatViewModel;
 
     private LocalBroadcastManager localBroadcastManager;
     private RefreshChatBroadcastReceiver mRefreshChatBroadCastReceiver;
@@ -36,10 +33,6 @@ public class MainActivity extends AppCompatActivity {
                 this,
                 new ViewModelProvider.AndroidViewModelFactory(this.getApplication())
         ).get(UserViewModel.class);
-        chatViewModel = new ViewModelProvider(
-                this,
-                new ViewModelProvider.AndroidViewModelFactory(getApplication())
-        ).get(ChatViewModel.class);
 
         NavigationUI.setupWithNavController(
                 bottomNavigationView,

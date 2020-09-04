@@ -11,6 +11,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.android.ecommerce.dao.CategoryDAO;
 import com.example.android.ecommerce.dao.ChatDao;
+import com.example.android.ecommerce.dao.FcmDao;
 import com.example.android.ecommerce.dao.OrderDao;
 import com.example.android.ecommerce.dao.ProductDao;
 import com.example.android.ecommerce.dao.UserDao;
@@ -20,6 +21,7 @@ import com.example.android.ecommerce.interfaces.SignInListener;
 import com.example.android.ecommerce.model.Category;
 import com.example.android.ecommerce.model.Chat;
 import com.example.android.ecommerce.model.ChatListItem;
+import com.example.android.ecommerce.model.Fcm;
 import com.example.android.ecommerce.model.OrderDetails;
 import com.example.android.ecommerce.model.OrderedProduct;
 import com.example.android.ecommerce.model.Product;
@@ -60,6 +62,7 @@ public class ECommerceRepository implements SignInListener {
     private OrderDao orderDao;
     private ProductDao productDao;
     private UserDao userDao;
+    private FcmDao fcmDao;
 
     private MyGoogleSignIn googleSignIn;
     private MyFacebookLogin facebookLogin;
@@ -103,6 +106,7 @@ public class ECommerceRepository implements SignInListener {
         orderDao = localDb.orderDao();
         productDao = localDb.productDao();
         userDao = localDb.userDao();
+        fcmDao = localDb.fcmDao();
 
         googleSignIn = new MyGoogleSignIn(application.getApplicationContext(), this);
         facebookLogin = new MyFacebookLogin(this);
@@ -125,6 +129,7 @@ public class ECommerceRepository implements SignInListener {
     }
 
     public LiveData<ProductDetails> getProductDetails(long pid) {
+        refreshProductDetails(pid);
         return productDao.loadProductDetails(pid);
     }
 
@@ -144,54 +149,79 @@ public class ECommerceRepository implements SignInListener {
         return chatDao.loadChatListItems();
     }
 
-    // ------ product -------
-
-    public void uploadProduct(String uid, String pName, long catId, String img, String price) {
-        webservice.insertProduct(uid, pName, catId, img, price);
+    public void insertProduct(String uid, String pName, long catId, String img, String price) {
+        executor.execute(() -> {
+            try {
+                webservice.insertProduct(uid, pName, catId, img, price).execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-    // ------ cart -------
-
-    public void addToCart(String uid, long pid) {
-        webservice.insertOrder(uid, pid);
+    public void insertOrder(String uid, long pid) {
+        executor.execute(() -> {
+            try {
+                webservice.insertOrder(uid, pid).execute();
+            } catch (IOException e) {
+                Log.d(TAG, "insertOrder error: " + e.getMessage());
+            }
+        });
     }
 
-    public void deleteOrder(long oid) {
-        webservice.deleteOrder(oid);
-    }
-
-    // ------ chat -------
-
-    public void sendMsg(String senderToken, String receiverToken, long pid, String msg) {
-        webservice.insertChat(senderToken, receiverToken, pid, msg);
-    }
-
-    // ------ fcm -------
-    public void updateFcmToken(String oldToken, String newToken) {
-        webservice.updateFcmToken(oldToken, newToken);
-    }
-
-    public void insertFcmToken(String uid, String token) {
-        webservice.insertFcmToken(uid, token);
+    public void insertChat(String senderToken, String receiverToken, long pid, String msg) {
+        executor.execute(() -> {
+            try {
+                webservice.insertChat(senderToken, receiverToken, pid, msg).execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public void insertFcmToken(String token) {
-        webservice.insertFcmToken(token);
+        executor.execute(() -> {
+            try {
+                webservice.insertFcmToken(token).execute();
+                fcmDao.insert(new Fcm(token, null));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
-//    public void signInLastSignedInUser() {
-//        GoogleSignInAccount googleSignInAccount;
-//        AccessToken facebookAccessToken;
-//
-//        if ((facebookAccessToken = AccessToken.getCurrentAccessToken()) != null) {
-//            loginFromFacebookAccessToken(facebookAccessToken);
-//        } else if ((googleSignInAccount = GoogleSignIn.getLastSignedInAccount(mContext)) != null) {
-//            userDao.insertUser(User.from(googleSignInAccount));
-//        } else {
-//            userDao.insertUser(null);
-//        }
-//    }
+    public void updateFcmToken(String oldToken, String newToken) {
+        executor.execute(() -> {
+            try {
+                webservice.updateFcmToken(oldToken, newToken).execute();
+                fcmDao.update(oldToken, newToken);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
+    public void updateFcmToken(Fcm fcm) {
+        Log.d(TAG, "inserted fcm: " + fcm);
+        executor.execute(() -> {
+            try {
+                fcmDao.insert(fcm);
+                webservice.insertFcmToken(fcm.token, fcm.uid).execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void deleteOrder(long oid) {
+        executor.execute(() -> {
+            try {
+                webservice.deleteOrder(oid).execute();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
     public void signOut(Activity activity) {
         googleSignIn.signOut(activity);
@@ -237,12 +267,18 @@ public class ECommerceRepository implements SignInListener {
         Log.d(TAG, "refreshProducts: called");
         executor.execute(() -> {
             try {
-                List<Product> products = webservice.getProducts().execute().body();
-                if (products == null) {
-                    Log.d(TAG, "refreshProducts: null products");
-                    return;
-                }
                 productDao.insertProducts(webservice.getProducts().execute().body());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public void refreshProductDetails(long pid) {
+        executor.execute(() -> {
+            try {
+                ProductDetails details = webservice.getProductDetails(pid).execute().body();
+                productDao.insertProductDetails(details);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -12,11 +12,13 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavDeepLinkBuilder;
 
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.repository.ECommerceRepository;
+import com.example.android.ecommerce.viewmodel.FcmViewModel;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -44,14 +46,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String oldToken = preferences.getString(OLD_TOKEN_KEY, null);
         preferences.edit().putString(OLD_TOKEN_KEY, s).apply();
 
-        ECommerceRepository repo = ECommerceRepository.getInstance(getApplication());
-
+//        ECommerceRepository repo = ECommerceRepository.getInstance(getApplication());
+        FcmViewModel fcmViewModel = new FcmViewModel(getApplication());
         if (oldToken == null) {
 //            addNewTokenOnServer(s);
-            repo.insertFcmToken(s);
+            fcmViewModel.insert(s);
         } else {
 //            updateTokenOnServer(oldToken, s);
-            repo.updateFcmToken(oldToken, s);
+            fcmViewModel.update(oldToken, s);
         }
     }
 

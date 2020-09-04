@@ -16,7 +16,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.android.ecommerce.model.Fcm;
 import com.example.android.ecommerce.utils.NavigationUtils;
+import com.example.android.ecommerce.viewmodel.FcmViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -26,11 +28,16 @@ import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import java.util.Arrays;
 
 public class SignInFragment extends Fragment implements View.OnClickListener {
+    private static final String TAG = "SignInFragment";
+
     private static final int RC_SIGN_IN = 1;
 
     private UserViewModel userViewModel;
@@ -56,6 +63,10 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication()))
                 .get(UserViewModel.class);
+        FcmViewModel fcmViewModel = new ViewModelProvider(
+                requireActivity(),
+                new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication()))
+                .get(FcmViewModel.class);
         NavController navController = NavHostFragment.findNavController(this);
 
         googleSignInButton.setOnClickListener(this);
@@ -81,6 +92,14 @@ public class SignInFragment extends Fragment implements View.OnClickListener {
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             if (user != null && NavigationUtils.isValidInContext(navController, R.id.signInFragment)) {
                 navController.popBackStack();
+
+                FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(new OnSuccessListener<InstanceIdResult>() {
+                    @Override
+                    public void onSuccess(InstanceIdResult instanceIdResult) {
+                        Log.d(TAG, "onSuccess: called");
+                        fcmViewModel.update(new Fcm(instanceIdResult.getToken(), user.uid));
+                    }
+                });
             }
         });
     }

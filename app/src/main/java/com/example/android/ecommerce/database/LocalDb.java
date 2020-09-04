@@ -9,6 +9,7 @@ import androidx.room.RoomDatabase;
 import com.example.android.ecommerce.adapters.TypeConverters;
 import com.example.android.ecommerce.dao.CategoryDAO;
 import com.example.android.ecommerce.dao.ChatDao;
+import com.example.android.ecommerce.dao.FcmDao;
 import com.example.android.ecommerce.dao.OrderDao;
 import com.example.android.ecommerce.dao.ProductDao;
 import com.example.android.ecommerce.dao.UserDao;
@@ -18,10 +19,11 @@ import com.example.android.ecommerce.model.ChatListItem;
 import com.example.android.ecommerce.model.Fcm;
 import com.example.android.ecommerce.model.Order;
 import com.example.android.ecommerce.model.Product;
+import com.example.android.ecommerce.model.ProductDetails;
 import com.example.android.ecommerce.model.User;
 
 @Database(entities = {Category.class, Chat.class, Fcm.class, Order.class,
-        Product.class, User.class, ChatListItem.class},
+        Product.class, User.class, ChatListItem.class, ProductDetails.class},
         version = 1, exportSchema = false)
 @androidx.room.TypeConverters({TypeConverters.class})
 public abstract class LocalDb extends RoomDatabase {
@@ -32,6 +34,7 @@ public abstract class LocalDb extends RoomDatabase {
     public abstract OrderDao orderDao();
     public abstract ProductDao productDao();
     public abstract UserDao userDao();
+    public abstract FcmDao fcmDao();
 
     public static LocalDb getDatabase(final Context context, RoomDatabase.Callback callback) {
         if (INSTANCE == null) {

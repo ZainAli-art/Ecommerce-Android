@@ -9,7 +9,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +20,10 @@ import com.example.android.ecommerce.adapters.OrderedProductRecyclerViewAdapter;
 import com.example.android.ecommerce.viewmodel.CartViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
-public class CartFragment extends Fragment implements OrderedProductRecyclerViewAdapter.OrderedProductItemListener {
+public class CartFragment extends Fragment implements OrderedProductRecyclerViewAdapter.OrderedProductItemListener,
+        SwipeRefreshLayout.OnRefreshListener {
+    private static final String TAG = "CartFragment";
+
     private NavController navController;
     private CartViewModel cartViewModel;
 
@@ -37,6 +42,9 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
         super.onViewCreated(view, savedInstanceState);
         navController = NavHostFragment.findNavController(this);
 
+        SwipeRefreshLayout refreshCartLayout = view.findViewById(R.id.refreshCartLayout);
+        refreshCartLayout.setOnRefreshListener(this);
+
         RecyclerView cartRecyclerView = view.findViewById(R.id.cartRecyclerView);
         adapter = new OrderedProductRecyclerViewAdapter(this);
         cartRecyclerView.setAdapter(adapter);
@@ -49,9 +57,14 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(UserViewModel.class);
-        userViewModel.getUser().observe(getViewLifecycleOwner(), user -> uid = user.uid);
-
-        cartViewModel.getCartProducts(uid).observe(getViewLifecycleOwner(), adapter::setItems);
+        userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+            uid = user.uid;
+            Log.d(TAG, "onViewCreated uid: " + uid);
+            cartViewModel.getCartProducts(uid).observe(getViewLifecycleOwner(), cartProducts -> {
+                adapter.setItems(cartProducts);
+                refreshCartLayout.setRefreshing(false);
+            });
+        });
     }
 
     @Override
@@ -75,5 +88,10 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
         adapter.getItems().remove(pos);
         adapter.notifyItemRemoved(pos);
         cartViewModel.deleteOrder(oid);
+    }
+
+    @Override
+    public void onRefresh() {
+        cartViewModel.refreshCart(uid);
     }
 }

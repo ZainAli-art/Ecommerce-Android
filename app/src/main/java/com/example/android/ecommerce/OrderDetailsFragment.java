@@ -37,6 +37,15 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
     private String uid;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Bundle args = getArguments();
+        oid = args.getLong(ORDER_DETAILS_ID);
+        uid = args.getString(USER_ID);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -46,10 +55,6 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        Bundle args = getArguments();
-        oid = args.getLong(ORDER_DETAILS_ID);
-        uid = args.getString(USER_ID);
 
         navController = NavHostFragment.findNavController(this);
 

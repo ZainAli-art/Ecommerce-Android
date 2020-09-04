@@ -43,6 +43,8 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
     private ProductRecyclerViewAdapter recentProductsAdapter;
     private CategoryRecyclerViewAdapter categoryAdapter;
 
+    private String uid;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -66,8 +68,8 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         recentProductsAdapter = new ProductRecyclerViewAdapter(Product.HORIZONTAL_TYPE, this);
         recentProductsRecyclerView.setAdapter(recentProductsAdapter);
 
-        SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.homeSwipeLayout);
-        swipeRefreshLayout.setOnRefreshListener(this);
+        SwipeRefreshLayout homeSwipeLayout = view.findViewById(R.id.homeSwipeLayout);
+        homeSwipeLayout.setOnRefreshListener(this);
 
         navController = NavHostFragment.findNavController(this);
         categoryViewModel = new ViewModelProvider(
@@ -83,12 +85,12 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
         ).get(ProductViewModel.class);
 
-//        userViewModel.signInLastSignedInUser();
-
         userViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
             if (internetPermissionGranted() &&
                     user == null && NavigationUtils.isValidInContext(navController, R.id.homeFragment)) {
                 navController.navigate(R.id.action_homeFragment_to_signInFragment);
+            } else if (user != null) {
+                uid = user.uid;
             }
         });
         categoryViewModel.getCategories().observe(getViewLifecycleOwner(), categories -> {
@@ -103,6 +105,7 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         productViewModel.getRecentProducts(RECENT_PRODUCTS_LIMIT).observe(getViewLifecycleOwner(), recentProducts -> {
             if (internetPermissionGranted()) {
                 recentProductsAdapter.setItems(recentProducts);
+                homeSwipeLayout.setRefreshing(false);
             }
         });
 
@@ -123,12 +126,14 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         Bundle args = new Bundle();
         long pid = recentProductsAdapter.getItem(pos).pid;
         args.putLong(ProductDetailsFragment.PRODUCT_ID, pid);
+        args.putString(ProductDetailsFragment.USER_ID, uid);
 
         navController.navigate(R.id.action_homeFragment_to_productDetailsFragment, args);
     }
 
     @Override
     public void onRefresh() {
+        categoryViewModel.refreshCategories();
         productViewModel.refreshProducts();
     }
 

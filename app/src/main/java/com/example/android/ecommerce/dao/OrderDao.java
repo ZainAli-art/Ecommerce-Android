@@ -22,7 +22,8 @@ public interface OrderDao {
     void insertOrders(List<Order> orders);
 
     @Query("SELECT oid, pname AS product, img_dir " +
-            "FROM orders o JOIN products p ON o.pid = p.pid " +
+            "FROM orders o " +
+            "JOIN products p ON o.pid = p.pid " +
             "WHERE o.uid = :uid")
     LiveData<List<OrderedProduct>> loadOrderedProducts(String uid);
 

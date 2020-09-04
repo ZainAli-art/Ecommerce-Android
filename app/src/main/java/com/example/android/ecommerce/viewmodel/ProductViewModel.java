@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.example.android.ecommerce.model.Fcm;
 import com.example.android.ecommerce.model.Product;
 import com.example.android.ecommerce.model.ProductDetails;
 import com.example.android.ecommerce.repository.ECommerceRepository;
@@ -33,7 +34,7 @@ public class ProductViewModel extends AndroidViewModel {
     }
 
     public void uploadProduct(String uid, String pName, long catId, String img, String price) {
-        repo.uploadProduct(uid, pName, catId, img, price);
+        repo.insertProduct(uid, pName, catId, img, price);
     }
 
     public void refreshProducts() {

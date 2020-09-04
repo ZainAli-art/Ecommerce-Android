@@ -27,8 +27,12 @@ public class CartViewModel extends AndroidViewModel {
         return repo.getOrderDetails(oid);
     }
 
+    public void refreshCart(String uid) {
+        repo.refreshOrders(uid);
+    }
+
     public void addToCart(String uid, long pid) {
-        repo.addToCart(uid, pid);
+        repo.insertOrder(uid, pid);
     }
 
     public void deleteOrder(long oid) {

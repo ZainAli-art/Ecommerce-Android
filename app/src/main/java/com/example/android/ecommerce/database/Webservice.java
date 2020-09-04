@@ -27,7 +27,7 @@ public interface Webservice {
 
     @FormUrlEncoded
     @POST("scripts/product/upload-product.php")
-    Call<Product> insertProduct(@Field("uid") String uid, @Field("pname") String pName, @Field("cat_id") long catId, @Field("img") String img, @Field("price") String price);
+    Call<Product> insertProduct(@Field("uid") String uid, @Field("pname") String pName, @Field("cat_id") long catId, @Field("image") String img, @Field("price") String price);
 
     @FormUrlEncoded
     @POST("scripts/order/add-order.php")
@@ -39,7 +39,7 @@ public interface Webservice {
 
     @FormUrlEncoded
     @POST("scripts/fcm/register-user-fcm-token.php")
-    Call<Fcm> insertFcmToken(@Field("uid") String uid, @Field("token") String token);
+    Call<Fcm> insertFcmToken(@Field("token") String token, @Field("uid") String uid);
 
     @FormUrlEncoded
     @POST("scripts/fcm/add-fcm-token.php")
@@ -58,7 +58,7 @@ public interface Webservice {
     Call<List<Product>> getRecentProducts();
 
     @GET("scripts/product/fetch-product-details-by-pid-json.php")
-    Call<List<ProductDetails>> getProductDetails(@Query("pid") long pid);
+    Call<ProductDetails> getProductDetails(@Query("pid") long pid);
 
     @FormUrlEncoded
     @POST("scripts/order/orders-by-uid-json.php")
@@ -70,7 +70,7 @@ public interface Webservice {
 
     @FormUrlEncoded
     @POST("scripts/order/order-details-by-oid-json.php")
-    Call<List<OrderDetails>> getOrderDetails(@Field("pid") long pid);
+    Call<OrderDetails> getOrderDetails(@Field("pid") long pid);
 
     @FormUrlEncoded
     @POST("scripts/chat/print-chat-json.php")
@@ -82,13 +82,13 @@ public interface Webservice {
 
     @FormUrlEncoded
     @POST("scripts/fcm/update-fcm-token.php")
-    Call<Fcm> updateFcmToken(@Field("old_token") String oldToken, @Field("new_token") String newToken);
+    Call<Void> updateFcmToken(@Field("old_token") String oldToken, @Field("new_token") String newToken);
 
     @FormUrlEncoded
     @POST("scripts/order/delete-order-by-oid.php")
-    Call<Order> deleteOrder(@Field("oid") long oid);
+    Call<Void> deleteOrder(@Field("oid") long oid);
 
     @FormUrlEncoded
     @POST("scripts/fcm/unregister-user-token.php")
-    Call<Fcm> deleteUserToken(@Field("token") String token);
+    Call<Void> deleteUserToken(@Field("token") String token);
 }
