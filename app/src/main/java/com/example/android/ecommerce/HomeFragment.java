@@ -113,7 +113,8 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
     public void onClickCategory(int pos) {
         long catId = categoryAdapter.getItem(pos).id;
         Bundle args = new Bundle();
-        args.putLong(SELECTED_CAT_ID, catId);
+        args.putLong(ProductListFragment.CATEGORY_ID, catId);
+        args.putString(ProductListFragment.USER_ID, uid);
 
         navController.navigate(R.id.action_homeFragment_to_productListFragment, args);
     }

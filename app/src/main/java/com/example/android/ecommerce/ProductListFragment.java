@@ -22,10 +22,15 @@ import com.example.android.ecommerce.viewmodel.ProductViewModel;
 
 public class ProductListFragment extends Fragment implements ProductRecyclerViewAdapter.ProductItemListener,
         SwipeRefreshLayout.OnRefreshListener {
+    public static final String CATEGORY_ID = "CATEGORY_ID";
+    public static final String USER_ID = "USER_ID";
+
     private NavController navController;
     private ProductRecyclerViewAdapter adapter;
-    private long catId;
     private ProductViewModel productViewModel;
+
+    private long catId;
+    private String uid;
 
     public ProductListFragment() {
         // Required empty public constructor
@@ -36,7 +41,8 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        catId = args.getLong(HomeFragment.SELECTED_CAT_ID);
+        catId = args.getLong(CATEGORY_ID);
+        uid = args.getString(USER_ID);
 
         navController = NavHostFragment.findNavController(this);
 
@@ -70,6 +76,11 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
 
     @Override
     public void onClickProduct(int pos) {
+        long pid = adapter.getItem(pos).pid;
+        Bundle args = getArguments();
+        args.putLong(ProductDetailsFragment.PRODUCT_ID, pid);
+        args.putString(ProductDetailsFragment.USER_ID, uid);
+
         navController.navigate(R.id.action_productListFragment_to_productDetailsFragment, getArguments());
     }
 

@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+
+import static com.example.android.ecommerce.utils.Constants.BASE_URL;
 
 public class ProductDetailsFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "ProductDetailsFragment";
@@ -55,6 +58,8 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
         Bundle args = getArguments();
         pid = args.getLong(PRODUCT_ID);
         uid = args.getString(USER_ID);
+
+        Log.d(TAG, "onCreate pid: " + pid);
 
         navController = NavHostFragment.findNavController(this);
 
@@ -112,7 +117,7 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
 
     private void updateUi(ProductDetails productDetails) {
         Uri imgUrl = Uri.parse(productDetails.imgUrl);
-        Glide.with(requireContext()).load(imgUrl).into(img);
+        Glide.with(requireContext()).load(BASE_URL + imgUrl).into(img);
         name.setText(productDetails.product);
         date.setText(productDetails.date.toString());
         category.setText(productDetails.category);
