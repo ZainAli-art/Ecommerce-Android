@@ -22,6 +22,7 @@ import com.example.android.ecommerce.model.Category;
 import com.example.android.ecommerce.model.Chat;
 import com.example.android.ecommerce.model.ChatListItem;
 import com.example.android.ecommerce.model.Fcm;
+import com.example.android.ecommerce.model.Order;
 import com.example.android.ecommerce.model.OrderDetails;
 import com.example.android.ecommerce.model.OrderedProduct;
 import com.example.android.ecommerce.model.Product;
@@ -289,7 +290,11 @@ public class ECommerceRepository implements SignInListener {
     public void refreshOrders(String uid) {
         executor.execute(() -> {
             try {
-                orderDao.insertOrders(webservice.getOrders(uid).execute().body());
+                List<Order> orders = webservice.getOrders(uid).execute().body();
+                if (orders != null) {
+                    orderDao.deleteAll();
+                    orderDao.insertOrders(orders);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
