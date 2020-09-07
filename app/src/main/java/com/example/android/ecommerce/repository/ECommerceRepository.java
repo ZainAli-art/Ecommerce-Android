@@ -280,7 +280,8 @@ public class ECommerceRepository implements SignInListener {
         executor.execute(() -> {
             try {
                 ProductDetails details = webservice.getProductDetails(pid).execute().body();
-                productDao.insertProductDetails(details);
+                if (details != null)
+                    productDao.insertProductDetails(details);
             } catch (IOException e) {
                 e.printStackTrace();
             }

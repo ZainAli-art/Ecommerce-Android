@@ -39,16 +39,17 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
     @Override
     public PViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        View itemView = null;
-
-        switch (viewType) {
-            case Product.VERTICAL_TYPE:
-                itemView = inflater.inflate(R.layout.product_list_item_vertical, parent, false);
-                break;
-            case Product.HORIZONTAL_TYPE:
-                itemView = inflater.inflate(R.layout.product_list_item_horizontal, parent, false);
-                break;
-        }
+//        View itemView = null;
+//
+//        switch (viewType) {
+//            case Product.VERTICAL_TYPE:
+//                itemView = inflater.inflate(R.layout.product_list_item_vertical, parent, false);
+//                break;
+//            case Product.HORIZONTAL_TYPE:
+//                itemView = inflater.inflate(R.layout.product_list_item_horizontal, parent, false);
+//                break;
+//        }
+        View itemView = inflater.inflate(R.layout.product_list_item_horizontal, parent, false);
 
         return new PViewHolder(itemView, listener, parent.getContext());
     }

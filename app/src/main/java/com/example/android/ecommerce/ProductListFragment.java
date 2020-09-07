@@ -8,7 +8,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +20,8 @@ import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
 import com.example.android.ecommerce.model.Product;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
 
-public class ProductListFragment extends Fragment implements ProductRecyclerViewAdapter.ProductItemListener {
+public class ProductListFragment extends Fragment implements ProductRecyclerViewAdapter.ProductItemListener,
+        SwipeRefreshLayout.OnRefreshListener {
     private NavController navController;
     private ProductRecyclerViewAdapter adapter;
     private long catId;
@@ -55,6 +58,7 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
         super.onViewCreated(view, savedInstanceState);
 
         RecyclerView productListRecyclerView = view.findViewById(R.id.productListRecyclerView);
+        productListRecyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         adapter = new ProductRecyclerViewAdapter(Product.VERTICAL_TYPE, this);
         productListRecyclerView.setAdapter(adapter);
 
@@ -67,5 +71,10 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
     @Override
     public void onClickProduct(int pos) {
         navController.navigate(R.id.action_productListFragment_to_productDetailsFragment, getArguments());
+    }
+
+    @Override
+    public void onRefresh() {
+        productViewModel.refreshProducts();
     }
 }
