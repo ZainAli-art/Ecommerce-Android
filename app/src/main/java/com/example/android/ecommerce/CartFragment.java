@@ -84,8 +84,8 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
     @Override
     public void onClickOrderedProduct(int pos) {
         Bundle args = new Bundle();
-        String oid = String.valueOf(adapter.getItems().get(pos).oid);
-        args.putString(OrderDetailsFragment.ORDER_DETAILS_ID, oid);
+        long oid = adapter.getItems().get(pos).oid;
+        args.putLong(OrderDetailsFragment.ORDER_DETAILS_ID, oid);
         args.putString(OrderDetailsFragment.USER_ID, uid);
 
         navController.navigate(R.id.action_cartFragment_to_orderDetailsFragment, args);
