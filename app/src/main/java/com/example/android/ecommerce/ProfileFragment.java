@@ -33,8 +33,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        navController = NavHostFragment.findNavController(this);
-
         userViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -51,6 +49,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
 
         ImageView profileImg = view.findViewById(R.id.profileImg);
         TextView fullName = view.findViewById(R.id.fullName);

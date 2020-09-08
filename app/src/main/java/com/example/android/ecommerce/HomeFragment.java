@@ -49,8 +49,6 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        navController = NavHostFragment.findNavController(this);
-
         categoryViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -75,6 +73,8 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
 
         RecyclerView categoryRecyclerView = view.findViewById(R.id.categoryRecyclerView);
         categoryAdapter = new CategoryRecyclerViewAdapter(Category.HORIZONTAL_TYPE, this);

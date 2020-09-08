@@ -28,8 +28,6 @@ public class ChatListFragment extends Fragment implements ChatListRecyclerViewAd
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        navController = NavHostFragment.findNavController(this);
-
         chatViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -46,6 +44,8 @@ public class ChatListFragment extends Fragment implements ChatListRecyclerViewAd
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
 
         chatListRecyclerView = view.findViewById(R.id.chatListRecyclerView);
         adapter = new ChatListRecyclerViewAdapter(this);

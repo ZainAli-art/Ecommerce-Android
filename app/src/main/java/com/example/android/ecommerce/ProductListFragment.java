@@ -1,5 +1,6 @@
 package com.example.android.ecommerce;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,16 +13,20 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
 import com.example.android.ecommerce.model.Product;
+import com.example.android.ecommerce.utils.Utility;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
 
 public class ProductListFragment extends Fragment implements ProductRecyclerViewAdapter.ProductItemListener,
         SwipeRefreshLayout.OnRefreshListener {
+    private static final String TAG = "ProductListFragment";
+
     public static final String CATEGORY_ID = "CATEGORY_ID";
     public static final String USER_ID = "USER_ID";
 
@@ -44,8 +49,6 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
         catId = args.getLong(CATEGORY_ID);
         uid = args.getString(USER_ID);
 
-        navController = NavHostFragment.findNavController(this);
-
         productViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -63,14 +66,26 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        navController = NavHostFragment.findNavController(this);
+
+        Context mContext = requireContext();
+        float width = Utility.getScreenWidthDp(mContext);
+        Log.d(TAG, "device width: " + width);
+
         RecyclerView productListRecyclerView = view.findViewById(R.id.productListRecyclerView);
-        productListRecyclerView.setLayoutManager(new GridLayoutManager(requireContext(), 2));
+        productListRecyclerView.setLayoutManager(
+                new GridLayoutManager(mContext,
+                        Utility.getNoOfColumns(mContext, 266)));    // width of 250 and padding of 8 each side
         adapter = new ProductRecyclerViewAdapter(Product.VERTICAL_TYPE, this);
         productListRecyclerView.setAdapter(adapter);
+
+        SwipeRefreshLayout refreshLayout = view.findViewById(R.id.productListSwipeRefreshLayout);
+        refreshLayout.setOnRefreshListener(this);
 
         // observers
         productViewModel.getProducts(catId).observe(getViewLifecycleOwner(), products -> {
             adapter.setItems(products);
+            refreshLayout.setRefreshing(false);
         });
     }
 

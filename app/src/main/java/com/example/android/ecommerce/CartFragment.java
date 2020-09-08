@@ -36,8 +36,6 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        navController = NavHostFragment.findNavController(this);
-
         cartViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -58,6 +56,8 @@ public class CartFragment extends Fragment implements OrderedProductRecyclerView
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
 
         SwipeRefreshLayout cartSwipeRefreshLayout = view.findViewById(R.id.cartSwipeRefreshLayout);
         cartSwipeRefreshLayout.setOnRefreshListener(this);

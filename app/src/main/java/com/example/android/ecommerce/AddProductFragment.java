@@ -27,7 +27,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.model.Category;
-import com.example.android.ecommerce.utils.ByteUtil;
+import com.example.android.ecommerce.utils.Utility;
 import com.example.android.ecommerce.viewmodel.CategoryViewModel;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
@@ -65,8 +65,6 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        navController = NavHostFragment.findNavController(this);
-
         userViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -91,6 +89,9 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
+
         productImgView = view.findViewById(R.id.productImgView);
         productName = view.findViewById(R.id.productName);
         priceText = view.findViewById(R.id.price);
@@ -151,7 +152,7 @@ public class AddProductFragment extends Fragment implements View.OnClickListener
                     String catName = catSpinner.getSelectedItem().toString();
                     String pName = productName.getText().toString();
                     long catId = catMap.get(catName);
-                    String img = ByteUtil.BitmapToString(bitmap);
+                    String img = Utility.BitmapToString(bitmap);
                     String price = priceText.getText().toString();
 
                     productViewModel.uploadProduct(uid, pName, catId, img, price);

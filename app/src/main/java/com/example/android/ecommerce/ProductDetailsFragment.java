@@ -61,8 +61,6 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
 
         Log.d(TAG, "onCreate pid: " + pid);
 
-        navController = NavHostFragment.findNavController(this);
-
         productViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -83,6 +81,8 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        navController = NavHostFragment.findNavController(this);
 
         img = view.findViewById(R.id.img);
         name = view.findViewById(R.id.name);

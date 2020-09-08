@@ -20,6 +20,8 @@ import com.bumptech.glide.Glide;
 import com.example.android.ecommerce.model.OrderDetails;
 import com.example.android.ecommerce.viewmodel.CartViewModel;
 
+import static com.example.android.ecommerce.utils.Constants.BASE_URL;
+
 public class OrderDetailsFragment extends Fragment implements View.OnClickListener {
     public static final String ORDER_DETAILS_ID = "com.example.android.ecommerce.ORDER_DETAILS_ID";
     public static final String USER_ID = "com.example.android.ecommerce.USER_ID";
@@ -44,8 +46,6 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
         oid = args.getLong(ORDER_DETAILS_ID);
         uid = args.getString(USER_ID);
 
-        navController = NavHostFragment.findNavController(this);
-
         cartViewModel = new ViewModelProvider(
                 requireActivity(),
                 new ViewModelProvider.AndroidViewModelFactory(requireActivity().getApplication())
@@ -63,6 +63,8 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        navController = NavHostFragment.findNavController(this);
+
         img = view.findViewById(R.id.img);
         productName = view.findViewById(R.id.productName);
         date = view.findViewById(R.id.date);
@@ -76,7 +78,7 @@ public class OrderDetailsFragment extends Fragment implements View.OnClickListen
     }
 
     private void updateUi(OrderDetails orderDetails) {
-        Glide.with(requireContext()).load(orderDetails.imgUrl).into(img);
+        Glide.with(requireContext()).load(BASE_URL + orderDetails.imgUrl).into(img);
         productName.setText(orderDetails.productName);
         date.setText(orderDetails.orderDate.toString());
         category.setText(orderDetails.category);
