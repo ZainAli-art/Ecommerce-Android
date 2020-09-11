@@ -58,7 +58,7 @@
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/category_list_item_horizontal" />
+                    tools:listitem="@layout/product_list_item_horizontal" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
