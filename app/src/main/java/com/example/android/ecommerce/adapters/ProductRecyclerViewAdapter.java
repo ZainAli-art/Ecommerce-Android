@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -27,7 +28,7 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
     private ProductItemListener listener;
 
     public interface ProductItemListener {
-        void onClickProduct(int pos);
+        void onClickProduct(View view, int pos);
     }
 
     public ProductRecyclerViewAdapter(int viewType, ProductItemListener listener) {
@@ -59,6 +60,7 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
         Product product = products.get(position);
         holder.setImage(product.imgUrl);
         holder.setText(product.name);
+        holder.onBind(product.name);
     }
 
     @Override
@@ -90,6 +92,7 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
         private ImageView pImage;
         private TextView pText;
         private Context mContext;
+        private String transitionName;
 
         public PViewHolder(@NonNull View itemView, ProductItemListener listener, Context context) {
             super(itemView);
@@ -108,9 +111,14 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
             pText.setText(text);
         }
 
+        public void onBind(String id) {
+            transitionName = id;
+            ViewCompat.setTransitionName(pImage, id);
+        }
+
         @Override
         public void onClick(View v) {
-            listener.onClickProduct(getAdapterPosition());
+            listener.onClickProduct(v, getAdapterPosition());
         }
     }
 }

@@ -90,7 +90,7 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
     }
 
     @Override
-    public void onClickProduct(int pos) {
+    public void onClickProduct(View view, int pos) {
         long pid = adapter.getItem(pos).pid;
         Bundle args = getArguments();
         args.putLong(ProductDetailsFragment.PRODUCT_ID, pid);
