@@ -69,19 +69,20 @@ public class OrderedProductRecyclerViewAdapter extends RecyclerView.Adapter<Orde
         notifyDataSetChanged();
     }
 
-    public static class OPViewHolder extends RecyclerView.ViewHolder {
+    public static class OPViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private OrderedProductItemListener listener;
         private ImageView pImage;
         private TextView pText;
         private Context mContext;
 
         public OPViewHolder(@NonNull View itemView, OrderedProductItemListener listener, Context context) {
             super(itemView);
+            this.listener = listener;
+            itemView.setOnClickListener(this);
             pImage = itemView.findViewById(R.id.oImage);
             pText = itemView.findViewById(R.id.oTitle);
             mContext = context;
-            itemView.setOnClickListener((view) -> listener.onClickOrderedProduct(getAdapterPosition()));
-            itemView.findViewById(R.id.delOrderBtn).setOnClickListener((view) ->
-                    listener.onClickDeleteOrderedProduct(getAdapterPosition()));
+            itemView.findViewById(R.id.delOrderBtn).setOnClickListener(this);
         }
 
         public void setImage(String imgUrl) {
@@ -90,6 +91,18 @@ public class OrderedProductRecyclerViewAdapter extends RecyclerView.Adapter<Orde
 
         public void setTitle(CharSequence title) {
             pText.setText(title);
+        }
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.orderedProductListItem:
+                    listener.onClickOrderedProduct(getAdapterPosition());
+                    break;
+                case R.id.delOrderBtn:
+                    listener.onClickDeleteOrderedProduct(getAdapterPosition());
+                    break;
+            }
         }
     }
 }

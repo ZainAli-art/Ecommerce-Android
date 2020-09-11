@@ -80,17 +80,19 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
         return viewType;
     }
 
-    public static class CatViewHolder extends RecyclerView.ViewHolder {
+    public static class CatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private CategoryItemListener listener;
         private ImageView catImage;
         private TextView catText;
         private Context mContext;
 
         public CatViewHolder(@NonNull View itemView, CategoryItemListener listener, Context context) {
             super(itemView);
+            this.listener = listener;
+            itemView.setOnClickListener(this);
             mContext = context;
             catImage = itemView.findViewById(R.id.catImage);
             catText = itemView.findViewById(R.id.catText);
-            itemView.setOnClickListener((view) -> listener.onClickCategory(getAdapterPosition()));
         }
 
         public void setImage(String imgUrl) {
@@ -99,6 +101,11 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
 
         public void setText(CharSequence text) {
             catText.setText(text);
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener.onClickCategory(getAdapterPosition());
         }
     }
 }

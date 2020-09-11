@@ -85,16 +85,18 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
         return viewType;
     }
 
-    public static class PViewHolder extends RecyclerView.ViewHolder {
+    public static class PViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private ProductItemListener listener;
         private ImageView pImage;
         private TextView pText;
         private Context mContext;
 
         public PViewHolder(@NonNull View itemView, ProductItemListener listener, Context context) {
             super(itemView);
+            this.listener = listener;
+            itemView.setOnClickListener(this);
             pImage = itemView.findViewById(R.id.pImage);
             pText = itemView.findViewById(R.id.pText);
-            itemView.setOnClickListener((view) -> listener.onClickProduct(getAdapterPosition()));
             mContext = context;
         }
 
@@ -104,6 +106,11 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
 
         public void setText(CharSequence text) {
             pText.setText(text);
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener.onClickProduct(getAdapterPosition());
         }
     }
 }

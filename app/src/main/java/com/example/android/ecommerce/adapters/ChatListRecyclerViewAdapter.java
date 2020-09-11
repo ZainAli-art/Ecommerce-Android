@@ -68,8 +68,9 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
         notifyDataSetChanged();
     }
 
-    public static class CLViewHolder extends RecyclerView.ViewHolder {
+    public static class CLViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private Context mContext;
+        private ChatListItemListener listener;
         private ImageView senderImg;
         private TextView senderName;
         private TextView msg;
@@ -77,10 +78,11 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
         public CLViewHolder(@NonNull View itemView, ChatListItemListener listener, Context context) {
             super(itemView);
             this.mContext = context;
+            this.listener = listener;
+            itemView.setOnClickListener(this);
             senderImg = itemView.findViewById(R.id.senderImg);
             senderName = itemView.findViewById(R.id.senderName);
             msg = itemView.findViewById(R.id.msg);
-            itemView.setOnClickListener((view) -> listener.onClickChatListItem(getAdapterPosition()));
         }
 
         public void setImg(String imgUrl) {
@@ -93,6 +95,11 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
 
         public void setMsg(String msg) {
             this.msg.setText(msg);
+        }
+
+        @Override
+        public void onClick(View v) {
+            listener.onClickChatListItem(getAdapterPosition());
         }
     }
 }
