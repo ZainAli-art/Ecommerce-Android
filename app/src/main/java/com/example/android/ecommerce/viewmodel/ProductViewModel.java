@@ -15,10 +15,12 @@ import java.util.List;
 
 public class ProductViewModel extends AndroidViewModel {
     ECommerceRepository repo;
+    private boolean firstTime;
 
     public ProductViewModel(@NonNull Application application) {
         super(application);
         repo = ECommerceRepository.getInstance(application);
+        firstTime = true;
     }
 
     public LiveData<List<Product>> getProducts(long catId) {
@@ -39,5 +41,21 @@ public class ProductViewModel extends AndroidViewModel {
 
     public void refreshProducts() {
         repo.refreshProducts();
+    }
+
+    /**
+     * used for stopping transition postpone if fragment/activity
+     * launched for the first time
+     *
+     * @return firstTime
+     * * true if view model is launched for first time
+     * * false other wise
+     */
+    public boolean isFirstTime() {
+        return firstTime;
+    }
+
+    public void setFirstTime(boolean firstTime) {
+        this.firstTime = firstTime;
     }
 }

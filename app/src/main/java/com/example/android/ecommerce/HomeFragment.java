@@ -15,6 +15,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ import static com.example.android.ecommerce.ProductDetailsFragment.PRODUCT_TRANS
 
 public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapter.CategoryItemListener,
         ProductRecyclerViewAdapter.ProductItemListener, SwipeRefreshLayout.OnRefreshListener {
+    private static final String TAG = "HomeFragment";
+
     public static final int REQUEST_INTERNET = 1;
     public static final int RECENT_PRODUCTS_LIMIT = 5;
 
@@ -75,8 +78,9 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onViewCreated: called");
+
         super.onViewCreated(view, savedInstanceState);
-        postponeEnterTransition();
 
         navController = NavHostFragment.findNavController(this);
 
@@ -105,8 +109,16 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
             }
         });
 
+        if (productViewModel.isFirstTime()) {
+            productViewModel.setFirstTime(false);
+        } else {
+            postponeEnterTransition();
+        }
+
         ViewGroup parentView = (ViewGroup) view.getParent();
         productViewModel.getRecentProducts(RECENT_PRODUCTS_LIMIT).observe(getViewLifecycleOwner(), recentProducts -> {
+            Log.d(TAG, "onViewCreated: recent products changed");
+
             if (internetPermissionGranted()) {
                 recentProductsAdapter.setItems(recentProducts);
 
