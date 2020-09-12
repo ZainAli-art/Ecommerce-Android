@@ -99,7 +99,7 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
 
         @Override
         public void onClick(View v) {
-            listener.onClickChatListItem(getAdapterPosition());
+            listener.onClickChatListItem(getBindingAdapterPosition());
         }
     }
 }

@@ -105,7 +105,7 @@ public class CategoryRecyclerViewAdapter extends RecyclerView.Adapter<CategoryRe
 
         @Override
         public void onClick(View v) {
-            listener.onClickCategory(getAdapterPosition());
+            listener.onClickCategory(getBindingAdapterPosition());
         }
     }
 }

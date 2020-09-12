@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,11 +18,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
 import com.example.android.ecommerce.model.Product;
 import com.example.android.ecommerce.utils.Utility;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
+
+import static com.example.android.ecommerce.ProductDetailsFragment.PRODUCT_TRANSITION_ID;
 
 public class ProductListFragment extends Fragment implements ProductRecyclerViewAdapter.ProductItemListener,
         SwipeRefreshLayout.OnRefreshListener {
@@ -65,6 +69,7 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        postponeEnterTransition();
 
         navController = NavHostFragment.findNavController(this);
 
@@ -78,25 +83,47 @@ public class ProductListFragment extends Fragment implements ProductRecyclerView
                         Utility.getNoOfColumns(mContext, 266)));    // width of 250 and padding of 8 each side
         adapter = new ProductRecyclerViewAdapter(Product.VERTICAL_TYPE, this);
         productListRecyclerView.setAdapter(adapter);
+        adapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
 
         SwipeRefreshLayout refreshLayout = view.findViewById(R.id.productListSwipeRefreshLayout);
         refreshLayout.setOnRefreshListener(this);
 
         // observers
+        ViewGroup parentView = (ViewGroup) view.getParent();
         productViewModel.getProducts(catId).observe(getViewLifecycleOwner(), products -> {
             adapter.setItems(products);
+
+            parentView.getViewTreeObserver()
+                    .addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                        @Override
+                        public boolean onPreDraw() {
+                            parentView.getViewTreeObserver()
+                                    .removeOnPreDrawListener(this);
+                            startPostponedEnterTransition();
+                            return true;
+                        }
+                    });
+
             refreshLayout.setRefreshing(false);
         });
     }
 
     @Override
     public void onClickProduct(View view, int pos) {
+        View pImage = view.findViewById(R.id.pImage);
+        String transitionName = String.valueOf(adapter.getItem(pos).pid);
+
         long pid = adapter.getItem(pos).pid;
         Bundle args = getArguments();
         args.putLong(ProductDetailsFragment.PRODUCT_ID, pid);
         args.putString(ProductDetailsFragment.USER_ID, uid);
+        args.putString(PRODUCT_TRANSITION_ID, transitionName);
 
-        navController.navigate(R.id.action_productListFragment_to_productDetailsFragment, getArguments());
+        FragmentNavigator.Extras extras = new FragmentNavigator.Extras.Builder()
+                .addSharedElement(pImage, transitionName)
+                .build();
+
+        navController.navigate(R.id.action_productListFragment_to_productDetailsFragment, getArguments(), null, extras);
     }
 
     @Override

@@ -60,7 +60,7 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
         Product product = products.get(position);
         holder.setImage(product.imgUrl);
         holder.setText(product.name);
-        holder.onBind(product.name);
+        holder.onBind(String.valueOf(product.pid));
     }
 
     @Override
@@ -92,7 +92,6 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
         private ImageView pImage;
         private TextView pText;
         private Context mContext;
-        private String transitionName;
 
         public PViewHolder(@NonNull View itemView, ProductItemListener listener, Context context) {
             super(itemView);
@@ -112,13 +111,12 @@ public class ProductRecyclerViewAdapter extends RecyclerView.Adapter<ProductRecy
         }
 
         public void onBind(String id) {
-            transitionName = id;
             ViewCompat.setTransitionName(pImage, id);
         }
 
         @Override
         public void onClick(View v) {
-            listener.onClickProduct(v, getAdapterPosition());
+            listener.onClickProduct(v, getBindingAdapterPosition());
         }
     }
 }

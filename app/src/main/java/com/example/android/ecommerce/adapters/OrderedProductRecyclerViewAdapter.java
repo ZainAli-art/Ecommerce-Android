@@ -97,10 +97,10 @@ public class OrderedProductRecyclerViewAdapter extends RecyclerView.Adapter<Orde
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.orderedProductListItem:
-                    listener.onClickOrderedProduct(getAdapterPosition());
+                    listener.onClickOrderedProduct(getBindingAdapterPosition());
                     break;
                 case R.id.delOrderBtn:
-                    listener.onClickDeleteOrderedProduct(getAdapterPosition());
+                    listener.onClickDeleteOrderedProduct(getBindingAdapterPosition());
                     break;
             }
         }

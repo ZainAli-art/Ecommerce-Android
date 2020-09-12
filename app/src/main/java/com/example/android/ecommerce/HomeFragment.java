@@ -7,7 +7,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -20,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.TextView;
 
 import com.example.android.ecommerce.adapters.CategoryRecyclerViewAdapter;
 import com.example.android.ecommerce.adapters.ProductRecyclerViewAdapter;
@@ -30,11 +28,10 @@ import com.example.android.ecommerce.viewmodel.CategoryViewModel;
 import com.example.android.ecommerce.viewmodel.ProductViewModel;
 import com.example.android.ecommerce.viewmodel.UserViewModel;
 
+import static com.example.android.ecommerce.ProductDetailsFragment.PRODUCT_TRANSITION_ID;
+
 public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapter.CategoryItemListener,
         ProductRecyclerViewAdapter.ProductItemListener, SwipeRefreshLayout.OnRefreshListener {
-    private static final String TAG = "HomeFragment";
-
-    public static final String SELECTED_CAT_ID = "SELECTED_CAT_ID";
     public static final int REQUEST_INTERNET = 1;
     public static final int RECENT_PRODUCTS_LIMIT = 5;
 
@@ -90,6 +87,7 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
         RecyclerView recentProductsRecyclerView = view.findViewById(R.id.recentProductsRecyclerView);
         recentProductsAdapter = new ProductRecyclerViewAdapter(Product.HORIZONTAL_TYPE, this);
         recentProductsRecyclerView.setAdapter(recentProductsAdapter);
+        recentProductsAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
 
         SwipeRefreshLayout homeSwipeRefreshLayout = view.findViewById(R.id.homeSwipeRefreshLayout);
         homeSwipeRefreshLayout.setOnRefreshListener(this);
@@ -143,14 +141,13 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
     @Override
     public void onClickProduct(View view, int pos) {
         View pImage = view.findViewById(R.id.pImage);
-        String transitionName = ((TextView) view.findViewById(R.id.pText)).getText().toString();
-        ViewCompat.setTransitionName(pImage, transitionName);
+        String transitionName = String.valueOf(recentProductsAdapter.getItem(pos).pid);
 
         Bundle args = new Bundle();
         long pid = recentProductsAdapter.getItem(pos).pid;
         args.putLong(ProductDetailsFragment.PRODUCT_ID, pid);
         args.putString(ProductDetailsFragment.USER_ID, uid);
-        args.putString("name", transitionName);
+        args.putString(PRODUCT_TRANSITION_ID, transitionName);
 
         FragmentNavigator.Extras extras = new FragmentNavigator.Extras.Builder()
                 .addSharedElement(pImage, transitionName)

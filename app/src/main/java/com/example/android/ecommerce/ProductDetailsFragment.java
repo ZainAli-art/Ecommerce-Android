@@ -41,6 +41,7 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
 
     public static final String PRODUCT_ID = "PRODUCT_ID";
     public static final String USER_ID = "USER_ID";
+    public static final String PRODUCT_TRANSITION_ID = "PRODUCT_TRANSITION_ID";
 
     private NavController navController;
 
@@ -71,7 +72,7 @@ public class ProductDetailsFragment extends Fragment implements View.OnClickList
         Bundle args = getArguments();
         pid = args.getLong(PRODUCT_ID);
         uid = args.getString(USER_ID);
-        transitionName = args.getString("name");
+        transitionName = args.getString(PRODUCT_TRANSITION_ID);
 
         Log.d(TAG, "onCreate pid: " + pid);
 
