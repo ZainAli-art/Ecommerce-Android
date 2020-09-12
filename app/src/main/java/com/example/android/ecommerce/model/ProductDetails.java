@@ -13,7 +13,7 @@ import java.util.Date;
 public class ProductDetails {
     @PrimaryKey
     @NonNull
-    public long pid;
+    public Long pid;
 
     @SerializedName("seller_id")
     @ColumnInfo(name = "seller_id")
@@ -38,7 +38,9 @@ public class ProductDetails {
     @ColumnInfo(name = "seller_token")
     public String sellerToken;
 
-    public ProductDetails(long pid, String sellerId, String product, String category, String imgUrl, Date date, double price, String seller, String contact, String sellerToken) {
+    public ProductDetails(@NonNull Long pid, String sellerId, String product,
+                          String category, String imgUrl, Date date, double price,
+                          String seller, String contact, String sellerToken) {
         this.pid = pid;
         this.sellerId = sellerId;
         this.product = product;

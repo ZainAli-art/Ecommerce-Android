@@ -44,9 +44,9 @@ public class ChatListRecyclerViewAdapter extends RecyclerView.Adapter<ChatListRe
     @Override
     public void onBindViewHolder(@NonNull CLViewHolder holder, int position) {
         ChatListItem chatListItem = chatListItems.get(position);
-        holder.setImg(chatListItem.getImgUrl());
-        holder.setSenderName(chatListItem.getSender());
-        holder.setMsg(chatListItem.getMsg());
+        holder.setImg(chatListItem.imgUrl);
+        holder.setSenderName(chatListItem.sender);
+        holder.setMsg(chatListItem.msg);
     }
 
     @Override

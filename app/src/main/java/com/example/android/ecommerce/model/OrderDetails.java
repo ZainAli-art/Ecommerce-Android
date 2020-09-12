@@ -13,7 +13,7 @@ import java.util.Date;
 public class OrderDetails {
     @PrimaryKey
     @NonNull
-    public long oid;
+    public Long oid;
 
     @SerializedName("pname")
     @ColumnInfo(name = "pname")
@@ -31,7 +31,7 @@ public class OrderDetails {
 
     public double price;
 
-    public OrderDetails(long oid, String productName, String imgUrl, String category, Date orderDate, double price) {
+    public OrderDetails(@NonNull Long oid, String productName, String imgUrl, String category, Date orderDate, double price) {
         this.oid = oid;
         this.productName = productName;
         this.imgUrl = imgUrl;

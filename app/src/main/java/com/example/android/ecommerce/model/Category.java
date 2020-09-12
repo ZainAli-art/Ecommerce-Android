@@ -16,7 +16,7 @@ public class Category {
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "cat_id")
-    public long id;
+    public Long id;
 
     @SerializedName("cat_name")
     @ColumnInfo(name = "cat_name")
@@ -26,7 +26,7 @@ public class Category {
     @ColumnInfo(name = "img_dir")
     public String imgUrl;
 
-    public Category(long id, String name, String imgUrl) {
+    public Category(@NonNull Long id, String name, String imgUrl) {
         this.id = id;
         this.name = name;
         this.imgUrl = imgUrl;

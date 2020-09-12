@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 public class Order {
     @PrimaryKey
     @NonNull
-    public long oid;
+    public Long oid;
 
     public String uid;
     public long pid;
@@ -22,7 +22,7 @@ public class Order {
     @ColumnInfo(name = "order_time")
     public Timestamp orderTime;
 
-    public Order(long oid, String uid, long pid, Timestamp orderTime) {
+    public Order(@NonNull Long oid, String uid, long pid, Timestamp orderTime) {
         this.oid = oid;
         this.uid = uid;
         this.pid = pid;

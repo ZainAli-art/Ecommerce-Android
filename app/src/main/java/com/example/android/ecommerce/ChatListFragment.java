@@ -61,9 +61,9 @@ public class ChatListFragment extends Fragment implements ChatListRecyclerViewAd
     @Override
     public void onClickChatListItem(int pos) {
         ChatListItem chatListItem = adapter.getItem(pos);
-        String senderToken = chatListItem.getSenderToken();
-        String receiverToken = chatListItem.getReceiverToken();
-        long pid = chatListItem.getPid();
+        String senderToken = chatListItem.senderToken;
+        String receiverToken = chatListItem.receiverToken;
+        long pid = chatListItem.pid;
 
         Bundle args = new Bundle();
         /* sender and receiver will be reversed in the chat */

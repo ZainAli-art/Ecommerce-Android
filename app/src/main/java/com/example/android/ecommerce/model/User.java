@@ -26,7 +26,7 @@ public class User {
     @ColumnInfo(name = "img_dir")
     public Uri imgUrl;
 
-    public User(String uid, String email, String fullName, Uri imgUrl) {
+    public User(@NonNull String uid, String email, String fullName, Uri imgUrl) {
         this.uid = uid;
         this.email = email;
         this.fullName = fullName;
@@ -39,6 +39,7 @@ public class User {
         String fullName = account.getDisplayName();
         Uri imgUrl = account.getPhotoUrl();
 
+        assert uid != null;
         return new User(uid, email, fullName, imgUrl);
     }
 }

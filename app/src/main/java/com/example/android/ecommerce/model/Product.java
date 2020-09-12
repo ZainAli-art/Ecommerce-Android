@@ -8,7 +8,6 @@ import androidx.room.PrimaryKey;
 import com.google.gson.annotations.SerializedName;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Entity(tableName = "products")
 public class Product {
@@ -17,7 +16,7 @@ public class Product {
 
     @PrimaryKey
     @NonNull
-    public long pid;
+    public Long pid;
 
     public String uid;
 
@@ -39,7 +38,9 @@ public class Product {
 
     public double price;
 
-    public Product(String uid, long catId, String name, String imgUrl, Timestamp uploadTime, double price) {
+    public Product(@NonNull Long pid, String uid, long catId, String name,
+                   String imgUrl, Timestamp uploadTime, double price) {
+        this.pid = pid;
         this.uid = uid;
         this.catId = catId;
         this.name = name;

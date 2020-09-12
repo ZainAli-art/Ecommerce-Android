@@ -12,7 +12,7 @@ public class Fcm {
 
     public String uid;
 
-    public Fcm(String token, String uid) {
+    public Fcm(@NonNull String token, String uid) {
         this.token = token;
         this.uid = uid;
     }

@@ -30,7 +30,7 @@ public class Chat {
     @NonNull
     public Timestamp time;
 
-    public Chat(String senderToken, String receiverToken, long pid, String msg, Timestamp time) {
+    public Chat(@NonNull String senderToken, @NonNull String receiverToken, long pid, String msg, @NonNull Timestamp time) {
         this.senderToken = senderToken;
         this.receiverToken = receiverToken;
         this.pid = pid;

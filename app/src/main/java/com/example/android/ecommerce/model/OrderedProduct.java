@@ -11,7 +11,7 @@ import com.google.gson.annotations.SerializedName;
 public class OrderedProduct {
     @PrimaryKey
     @NonNull
-    public long oid;
+    public Long oid;
 
     @SerializedName("product")
     @ColumnInfo(name = "product")
@@ -21,7 +21,7 @@ public class OrderedProduct {
     @ColumnInfo(name = "img_dir")
     public String imgUrl;
 
-    public OrderedProduct(long oid, String productName, String imgUrl) {
+    public OrderedProduct(@NonNull Long oid, String productName, String imgUrl) {
         this.oid = oid;
         this.productName = productName;
         this.imgUrl = imgUrl;
