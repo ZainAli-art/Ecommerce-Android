@@ -14,6 +14,7 @@ import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.transition.Fade;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -54,6 +55,8 @@ public class HomeFragment extends Fragment implements CategoryRecyclerViewAdapte
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setExitTransition(new Fade());
 
         categoryViewModel = new ViewModelProvider(
                 requireActivity(),
